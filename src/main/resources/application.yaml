@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: gestao-consultas
+
+  datasource:
+    url: jdbc:mysql://localhost:3307/sistema_gestao_consultas
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+jwt:
+  secret: ${JWT_SECRET}
+
+server:
+  port: 8080
