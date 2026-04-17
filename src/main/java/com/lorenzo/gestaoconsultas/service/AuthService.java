@@ -7,6 +7,8 @@ import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class AuthService {
 
@@ -26,6 +28,9 @@ public class AuthService {
         if (!encoder.matches(request.getSenha(), usuario.getSenha())) {
             throw new RuntimeException("Senha inválida");
         }
+
+        usuario.setUltimoLogin(LocalDateTime.now());
+        repository.save(usuario);
 
         return jwtService.gerarToken(usuario);
     }
