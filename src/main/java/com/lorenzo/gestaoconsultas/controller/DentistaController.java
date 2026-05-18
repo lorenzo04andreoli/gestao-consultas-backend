@@ -20,8 +20,8 @@ public class DentistaController {
     }
 
     @PostMapping
-    public Dentista criar(@RequestBody @Valid Dentista dentista) {
-        return service.salvar(dentista);
+    public DentistaResponseDto criar(@RequestBody @Valid Dentista dentista) {
+        return service.salvarResponse(dentista);
     }
 
     @GetMapping
@@ -30,13 +30,13 @@ public class DentistaController {
     }
 
     @GetMapping("/{id}")
-    public Dentista buscarPorId(@PathVariable Long id) {
-        return service.buscarPorId(id);
+    public DentistaResponseDto buscarPorId(@PathVariable Long id) {
+        return service.buscarResponsePorId(id);
     }
 
     @PutMapping("/{id}")
-    public Dentista atualizar(@PathVariable Long id, @RequestBody @Valid Dentista dentista) {
-        return service.atualizar(id, dentista);
+    public DentistaResponseDto atualizar(@PathVariable Long id, @RequestBody @Valid Dentista dentista) {
+        return service.atualizarResponse(id, dentista);
     }
 
     @DeleteMapping("/{id}")

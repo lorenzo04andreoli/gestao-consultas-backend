@@ -2,6 +2,7 @@ package com.lorenzo.gestaoconsultas.controller;
 
 import com.lorenzo.gestaoconsultas.dto.LoginRequestDto;
 import com.lorenzo.gestaoconsultas.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody LoginRequestDto request) {
+    public Map<String, String> login(@RequestBody @Valid LoginRequestDto request) {
         String token = service.login(request);
         return Map.of("token", token);
     }

@@ -4,6 +4,8 @@ package com.lorenzo.gestaoconsultas.service;
 import com.lorenzo.gestaoconsultas.dto.LoginRequestDto;
 import com.lorenzo.gestaoconsultas.entity.Usuario;
 import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,14 +26,14 @@ public class AuthService {
 
     public String login(LoginRequestDto request) {
         Usuario usuario = repository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new BadCredentialsException("Credenciais inválidas"));
 
         if (!usuario.getAtivo()) {
-            throw new RuntimeException("Usuário inativo");
+            throw new DisabledException("Usuário inativo");
         }
 
         if (!encoder.matches(request.getSenha(), usuario.getSenha())) {
-            throw new RuntimeException("Senha inválida");
+            throw new BadCredentialsException("Credenciais inválidas");
         }
 
         usuario.setUltimoLogin(LocalDateTime.now());

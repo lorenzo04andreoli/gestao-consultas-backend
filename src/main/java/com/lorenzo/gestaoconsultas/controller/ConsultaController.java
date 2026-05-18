@@ -1,7 +1,7 @@
 package com.lorenzo.gestaoconsultas.controller;
 
 import com.lorenzo.gestaoconsultas.dto.ConsultaRequestDto;
-import com.lorenzo.gestaoconsultas.entity.Consulta;
+import com.lorenzo.gestaoconsultas.dto.ConsultaResponseDto;
 import com.lorenzo.gestaoconsultas.service.ConsultaService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -19,30 +19,29 @@ public class ConsultaController {
         this.service = service;
     }
 
-
     @PostMapping
-    public Consulta criar(@RequestBody @Valid ConsultaRequestDto dto) {
+    public ConsultaResponseDto criar(@RequestBody @Valid ConsultaRequestDto dto) {
         return service.agendar(dto);
     }
 
     @GetMapping
-    public List<Consulta> listar(){
+    public List<ConsultaResponseDto> listar() {
         return service.listar();
     }
 
     @PutMapping("/{id}/cancelar")
-    public Consulta cancelar(@PathVariable Long id,
-                             @RequestParam String motivo) {
+    public ConsultaResponseDto cancelar(@PathVariable Long id,
+                                        @RequestParam String motivo) {
         return service.cancelar(id, motivo);
     }
 
     @PutMapping("/{id}/finalizar")
-    public Consulta finalizar(@PathVariable Long id) {
+    public ConsultaResponseDto finalizar(@PathVariable Long id) {
         return service.finalizar(id);
     }
 
     @GetMapping("/relatorios")
-    public List<Consulta> relatorios(
+    public List<ConsultaResponseDto> relatorios(
             @RequestParam(required = false) Long pacienteId,
             @RequestParam(required = false) Long dentistaId,
             @RequestParam(required = false) Long especialidadeId,
