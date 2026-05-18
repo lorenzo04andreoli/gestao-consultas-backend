@@ -36,6 +36,10 @@ public class Dentista {
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
+    @ManyToOne
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
+
     @ManyToMany
     @JoinTable(
             name = "dentista_especialidade",
@@ -115,5 +119,13 @@ public class Dentista {
 
     public void setEspecialidades(List<Especialidade> especialidades) {
         this.especialidades = especialidades;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }

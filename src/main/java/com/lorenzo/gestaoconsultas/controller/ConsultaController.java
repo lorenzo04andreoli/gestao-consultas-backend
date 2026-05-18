@@ -1,10 +1,12 @@
 package com.lorenzo.gestaoconsultas.controller;
 
+import com.lorenzo.gestaoconsultas.dto.ConsultaRequestDto;
 import com.lorenzo.gestaoconsultas.entity.Consulta;
 import com.lorenzo.gestaoconsultas.service.ConsultaService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,24 +19,40 @@ public class ConsultaController {
         this.service = service;
     }
 
+
     @PostMapping
-    public Consulta criar(@RequestBody @Valid Consulta consulta) {
-        return service.agendar(consulta);
+    public Consulta criar(@RequestBody @Valid ConsultaRequestDto dto) {
+        return service.agendar(dto);
     }
 
     @GetMapping
-    public List<Consulta> listar(
-            @RequestParam (required = false) Long dentistaId,
-            @RequestParam (required = false) String perfil,
-            @RequestParam (required = false) Long usuarioId
-
-    ){
-        return service.listar(perfil, dentistaId, usuarioId);
+    public List<Consulta> listar(){
+        return service.listar();
     }
 
     @PutMapping("/{id}/cancelar")
     public Consulta cancelar(@PathVariable Long id,
                              @RequestParam String motivo) {
         return service.cancelar(id, motivo);
+    }
+
+    @PutMapping("/{id}/finalizar")
+    public Consulta finalizar(@PathVariable Long id) {
+        return service.finalizar(id);
+    }
+
+    @GetMapping("/relatorios")
+    public List<Consulta> relatorios(
+            @RequestParam(required = false) Long pacienteId,
+            @RequestParam(required = false) Long dentistaId,
+            @RequestParam(required = false) Long especialidadeId,
+            @RequestParam(required = false) String dataInicio,
+            @RequestParam(required = false) String dataFim
+    ) {
+
+        LocalDateTime inicio = dataInicio != null ? LocalDateTime.parse(dataInicio) : null;
+        LocalDateTime fim = dataFim != null ? LocalDateTime.parse(dataFim) : null;
+
+        return service.filtrar(pacienteId, dentistaId, especialidadeId, inicio, fim);
     }
 }

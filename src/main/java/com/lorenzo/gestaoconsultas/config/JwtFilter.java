@@ -1,5 +1,7 @@
 package com.lorenzo.gestaoconsultas.config;
 
+import com.lorenzo.gestaoconsultas.entity.Usuario;
+import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
 import com.lorenzo.gestaoconsultas.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,9 +19,11 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UsuarioRepository usuarioRepository;
 
-    public JwtFilter(JwtService jwtService) {
+    public JwtFilter(JwtService jwtService, UsuarioRepository usuarioRepository) {
         this.jwtService = jwtService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Override
@@ -28,6 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        // libera rota de login
         if (request.getServletPath().startsWith("/auth")) {
             filterChain.doFilter(request, response);
             return;
@@ -38,23 +43,31 @@ public class JwtFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
-            if (jwtService.tokenValido(token)) {
-
-                String email = jwtService.extrairEmail(token);
-                String perfil = jwtService.extrairPerfil(token);
-
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                email,
-                                null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + perfil))
-                        );
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
+            if (!jwtService.tokenValido(token)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
+
+            String email = jwtService.extrairEmail(token);
+            String perfil = jwtService.extrairPerfil(token);
+
+            // BUSCA USUÁRIO NO BANCO
+            Usuario usuario = usuarioRepository.findByEmail(email)
+                    .orElse(null);
+
+            // VALIDA SE EXISTE E ESTÁ ATIVO
+            if (usuario == null || !usuario.getAtivo()) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(
+                            email,
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_" + perfil))
+                    );
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);

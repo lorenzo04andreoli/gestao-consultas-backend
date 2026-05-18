@@ -14,16 +14,21 @@ public class AuthService {
 
     private final UsuarioRepository repository;
     private final JwtService jwtService;
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder encoder;
 
-    public AuthService (UsuarioRepository repository, JwtService jwtService) {
+    public AuthService (UsuarioRepository repository, JwtService jwtService, BCryptPasswordEncoder encoder) {
         this.repository = repository;
         this.jwtService = jwtService;
+        this.encoder = encoder;
     }
 
     public String login(LoginRequestDto request) {
         Usuario usuario = repository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (!usuario.getAtivo()) {
+            throw new RuntimeException("Usuário inativo");
+        }
 
         if (!encoder.matches(request.getSenha(), usuario.getSenha())) {
             throw new RuntimeException("Senha inválida");

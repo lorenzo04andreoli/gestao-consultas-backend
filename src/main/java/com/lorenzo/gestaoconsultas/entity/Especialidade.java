@@ -1,5 +1,6 @@
 package com.lorenzo.gestaoconsultas.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -16,6 +17,7 @@ public class Especialidade {
     @NotBlank
     private String nome;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "especialidades")
     private List<Dentista> dentistas;
 

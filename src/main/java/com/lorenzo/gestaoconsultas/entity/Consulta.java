@@ -1,5 +1,6 @@
 package com.lorenzo.gestaoconsultas.entity;
 
+import com.lorenzo.gestaoconsultas.enums.StatusConsulta;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -39,13 +40,13 @@ public class Consulta {
 
     private LocalDateTime dataRegistro;
 
-    @NotBlank
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private StatusConsulta status;
 
     @PrePersist
     public void prePersist(){
         this.setDataRegistro(LocalDateTime.now());
-        this.setStatus("AGENDADA");
+        this.setStatus(StatusConsulta.AGENDADA);
     }
 
 
@@ -121,11 +122,12 @@ public class Consulta {
         this.dataRegistro = dataRegistro;
     }
 
-    public String getStatus() {
+
+    public StatusConsulta getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(StatusConsulta status) {
         this.status = status;
     }
 }

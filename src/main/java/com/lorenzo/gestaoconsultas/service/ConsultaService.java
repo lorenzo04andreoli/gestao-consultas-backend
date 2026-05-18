@@ -1,8 +1,17 @@
 package com.lorenzo.gestaoconsultas.service;
 
 
+import com.lorenzo.gestaoconsultas.dto.ConsultaRequestDto;
 import com.lorenzo.gestaoconsultas.entity.Consulta;
+import com.lorenzo.gestaoconsultas.entity.Dentista;
+import com.lorenzo.gestaoconsultas.entity.Paciente;
+import com.lorenzo.gestaoconsultas.entity.Usuario;
+import com.lorenzo.gestaoconsultas.enums.StatusConsulta;
 import com.lorenzo.gestaoconsultas.repository.ConsultaRepository;
+import com.lorenzo.gestaoconsultas.repository.DentistaRepository;
+import com.lorenzo.gestaoconsultas.repository.PacienteRepository;
+import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,27 +22,64 @@ public class ConsultaService {
 
     private final ConsultaRepository repository;
 
-    public ConsultaService(ConsultaRepository repository) {
+    private final UsuarioRepository usuarioRepository;
+
+    private final PacienteRepository pacienteRepository;
+
+    private final DentistaRepository dentistaRepository;
+
+    public ConsultaService(ConsultaRepository repository, UsuarioRepository usuarioRepository, PacienteRepository pacienteRepository, DentistaRepository dentistaRepository) {
+        this.dentistaRepository = dentistaRepository;
+        this.pacienteRepository = pacienteRepository;
+        this.usuarioRepository = usuarioRepository;
         this.repository = repository;
     }
 
-    public Consulta agendar(Consulta consulta){
+    public Consulta agendar(ConsultaRequestDto dto){
 
-        //Não pode ser no passado
+        Usuario usuario = getUsuarioAutenticado();
+
+        Paciente paciente = pacienteRepository.findById(dto.getPacienteId())
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+
+        Dentista dentista = dentistaRepository.findById(dto.getDentistaId())
+                .orElseThrow(() -> new RuntimeException("Dentista não encontrado"));
+
+        if (isDentista(usuario) && !dentista.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Dentista não pode agendar consultas para outro dentista");
+        }
+
+        Consulta consulta = new Consulta();
+        consulta.setUsuario(usuario);
+        consulta.setPaciente(paciente);
+        consulta.setDentista(dentista);
+        consulta.setDescricao(dto.getDescricao());
+        consulta.setDataInicio(dto.getDataInicio());
+        consulta.setDataFim(dto.getDataFim());
+
+        // validações
+
+        if (!dentista.getAtivo()) {
+            throw new RuntimeException("Dentista está inativo");
+        }
+
+        if (!usuario.getAtivo()) {
+            throw new RuntimeException("Usuário está inativo");
+        }
+
         if (consulta.getDataInicio().isBefore(LocalDateTime.now())){
             throw new RuntimeException("Data de início não pode ser no passado");
         }
 
-        //dataFim menor que início
-        if(consulta.getDataFim().isBefore(consulta.getDataInicio())){
-            throw new RuntimeException("Data de fim não pode ser antes da data de início");
+        if(!consulta.getDataFim().isAfter(consulta.getDataInicio())){
+            throw new RuntimeException("Data de fim deve ser após a data de início");
         }
 
-        //conflito de horário
-        boolean conflito = repository.existsByDentistaAndDataInicioBetween(
-                consulta.getDentista(),
+        boolean conflito = repository.existeConflito(
+                dentista,
                 consulta.getDataInicio(),
-                consulta.getDataFim()
+                consulta.getDataFim(),
+                StatusConsulta.CANCELADA
         );
 
         if (conflito){
@@ -43,10 +89,35 @@ public class ConsultaService {
         return repository.save(consulta);
     }
 
-    public List<Consulta> listar(String perfil, Long usuarioId, Long dentistaId) {
+    public Consulta finalizar(Long id) {
 
-        if (perfil.equals("DENTISTA")) {
-            return repository.findByDentistaId(dentistaId);
+        Consulta consulta = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
+        validarAcessoDentista(consulta);
+
+        if (consulta.getStatus() == StatusConsulta.CANCELADA) {
+            throw new RuntimeException("Consulta cancelada não pode ser finalizada");
+        }
+
+        if (consulta.getStatus() == StatusConsulta.FINALIZADA) {
+            throw new RuntimeException("Consulta já finalizada");
+        }
+
+        if (consulta.getDataInicio().isAfter(LocalDateTime.now())) {
+            throw new RuntimeException("Consulta ainda não começou");
+        }
+
+        consulta.setStatus(StatusConsulta.FINALIZADA);
+
+        return repository.save(consulta);
+    }
+
+    public List<Consulta> listar() {
+
+        Usuario usuario = getUsuarioAutenticado();
+
+        if (isDentista(usuario)) {
+            return repository.findByDentistaUsuarioId(usuario.getId());
         }
 
         return repository.findAll();
@@ -56,14 +127,58 @@ public class ConsultaService {
 
         Consulta consulta = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
+        validarAcessoDentista(consulta);
 
-        if (motivo == null || motivo.isEmpty()) {
+        if (motivo == null || motivo.trim().isEmpty()) {
             throw new RuntimeException("Motivo é obrigatório");
         }
 
-        consulta.setStatus("CANCELADA");
+        consulta.setStatus(StatusConsulta.CANCELADA);
         consulta.setMotivoCancelamento(motivo);
 
         return repository.save(consulta);
+    }
+
+    public List<Consulta> filtrar(
+            Long pacienteId,
+            Long dentistaId,
+            Long especialidadeId,
+            LocalDateTime inicio,
+            LocalDateTime fim
+    ) {
+
+        Usuario usuario = getUsuarioAutenticado();
+        Long usuarioDentistaId = isDentista(usuario) ? usuario.getId() : null;
+
+        return repository.filtrarConsultas(
+                usuarioDentistaId,
+                pacienteId,
+                dentistaId,
+                especialidadeId,
+                inicio,
+                fim
+        );
+    }
+
+    private Usuario getUsuarioAutenticado() {
+        String email = (String) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+
+    private boolean isDentista(Usuario usuario) {
+        return "DENTISTA".equals(usuario.getPerfil());
+    }
+
+    private void validarAcessoDentista(Consulta consulta) {
+        Usuario usuario = getUsuarioAutenticado();
+
+        if (isDentista(usuario) && !consulta.getDentista().getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Dentista não tem permissão para acessar esta consulta");
+        }
     }
 }

@@ -14,9 +14,10 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
 
-    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder encoder;
 
-    public UsuarioService(UsuarioRepository repository) {
+    public UsuarioService(UsuarioRepository repository, BCryptPasswordEncoder encoder) {
+        this.encoder = encoder;
         this.repository = repository;
     }
 
