@@ -32,6 +32,8 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        SecurityContextHolder.clearContext();
+
         // libera rota de login
         if (request.getServletPath().startsWith("/auth")) {
             filterChain.doFilter(request, response);

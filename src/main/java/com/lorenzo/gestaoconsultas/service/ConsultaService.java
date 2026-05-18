@@ -1,7 +1,7 @@
 package com.lorenzo.gestaoconsultas.service;
 
-
 import com.lorenzo.gestaoconsultas.dto.ConsultaRequestDto;
+import com.lorenzo.gestaoconsultas.dto.ConsultaResponseDto;
 import com.lorenzo.gestaoconsultas.entity.Consulta;
 import com.lorenzo.gestaoconsultas.entity.Dentista;
 import com.lorenzo.gestaoconsultas.entity.Paciente;
@@ -21,22 +21,19 @@ import java.util.List;
 public class ConsultaService {
 
     private final ConsultaRepository repository;
-
     private final UsuarioRepository usuarioRepository;
-
     private final PacienteRepository pacienteRepository;
-
     private final DentistaRepository dentistaRepository;
 
-    public ConsultaService(ConsultaRepository repository, UsuarioRepository usuarioRepository, PacienteRepository pacienteRepository, DentistaRepository dentistaRepository) {
+    public ConsultaService(ConsultaRepository repository, UsuarioRepository usuarioRepository,
+                           PacienteRepository pacienteRepository, DentistaRepository dentistaRepository) {
         this.dentistaRepository = dentistaRepository;
         this.pacienteRepository = pacienteRepository;
         this.usuarioRepository = usuarioRepository;
         this.repository = repository;
     }
 
-    public Consulta agendar(ConsultaRequestDto dto){
-
+    public ConsultaResponseDto agendar(ConsultaRequestDto dto) {
         Usuario usuario = getUsuarioAutenticado();
 
         Paciente paciente = pacienteRepository.findById(dto.getPacienteId())
@@ -57,40 +54,12 @@ public class ConsultaService {
         consulta.setDataInicio(dto.getDataInicio());
         consulta.setDataFim(dto.getDataFim());
 
-        // validações
+        validarAgendamento(usuario, dentista, consulta);
 
-        if (!dentista.getAtivo()) {
-            throw new RuntimeException("Dentista está inativo");
-        }
-
-        if (!usuario.getAtivo()) {
-            throw new RuntimeException("Usuário está inativo");
-        }
-
-        if (consulta.getDataInicio().isBefore(LocalDateTime.now())){
-            throw new RuntimeException("Data de início não pode ser no passado");
-        }
-
-        if(!consulta.getDataFim().isAfter(consulta.getDataInicio())){
-            throw new RuntimeException("Data de fim deve ser após a data de início");
-        }
-
-        boolean conflito = repository.existeConflito(
-                dentista,
-                consulta.getDataInicio(),
-                consulta.getDataFim(),
-                StatusConsulta.CANCELADA
-        );
-
-        if (conflito){
-            throw new RuntimeException("Dentista já possui uma consulta nesse horário");
-        }
-
-        return repository.save(consulta);
+        return toResponseDto(repository.save(consulta));
     }
 
-    public Consulta finalizar(Long id) {
-
+    public ConsultaResponseDto finalizar(Long id) {
         Consulta consulta = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
         validarAcessoDentista(consulta);
@@ -109,22 +78,20 @@ public class ConsultaService {
 
         consulta.setStatus(StatusConsulta.FINALIZADA);
 
-        return repository.save(consulta);
+        return toResponseDto(repository.save(consulta));
     }
 
-    public List<Consulta> listar() {
-
+    public List<ConsultaResponseDto> listar() {
         Usuario usuario = getUsuarioAutenticado();
 
         if (isDentista(usuario)) {
-            return repository.findByDentistaUsuarioId(usuario.getId());
+            return toResponseDtoList(repository.findByDentistaUsuarioId(usuario.getId()));
         }
 
-        return repository.findAll();
+        return toResponseDtoList(repository.findAll());
     }
 
-    public Consulta cancelar(Long id, String motivo) {
-
+    public ConsultaResponseDto cancelar(Long id, String motivo) {
         Consulta consulta = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
         validarAcessoDentista(consulta);
@@ -134,30 +101,53 @@ public class ConsultaService {
         }
 
         consulta.setStatus(StatusConsulta.CANCELADA);
-        consulta.setMotivoCancelamento(motivo);
+        consulta.setMotivoCancelamento(motivo.trim());
 
-        return repository.save(consulta);
+        return toResponseDto(repository.save(consulta));
     }
 
-    public List<Consulta> filtrar(
-            Long pacienteId,
-            Long dentistaId,
-            Long especialidadeId,
-            LocalDateTime inicio,
-            LocalDateTime fim
-    ) {
-
+    public List<ConsultaResponseDto> filtrar(Long pacienteId, Long dentistaId, Long especialidadeId,
+                                             LocalDateTime inicio, LocalDateTime fim) {
         Usuario usuario = getUsuarioAutenticado();
         Long usuarioDentistaId = isDentista(usuario) ? usuario.getId() : null;
 
-        return repository.filtrarConsultas(
+        return toResponseDtoList(repository.filtrarConsultas(
                 usuarioDentistaId,
                 pacienteId,
                 dentistaId,
                 especialidadeId,
                 inicio,
                 fim
+        ));
+    }
+
+    private void validarAgendamento(Usuario usuario, Dentista dentista, Consulta consulta) {
+        if (!dentista.getAtivo()) {
+            throw new RuntimeException("Dentista está inativo");
+        }
+
+        if (!usuario.getAtivo()) {
+            throw new RuntimeException("Usuário está inativo");
+        }
+
+        if (consulta.getDataInicio().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Data de início não pode ser no passado");
+        }
+
+        if (!consulta.getDataFim().isAfter(consulta.getDataInicio())) {
+            throw new RuntimeException("Data de fim deve ser após a data de início");
+        }
+
+        boolean conflito = repository.existeConflito(
+                dentista,
+                consulta.getDataInicio(),
+                consulta.getDataFim(),
+                StatusConsulta.CANCELADA
         );
+
+        if (conflito) {
+            throw new RuntimeException("Dentista já possui uma consulta nesse horário");
+        }
     }
 
     private Usuario getUsuarioAutenticado() {
@@ -180,5 +170,27 @@ public class ConsultaService {
         if (isDentista(usuario) && !consulta.getDentista().getUsuario().getId().equals(usuario.getId())) {
             throw new RuntimeException("Dentista não tem permissão para acessar esta consulta");
         }
+    }
+
+    private List<ConsultaResponseDto> toResponseDtoList(List<Consulta> consultas) {
+        return consultas.stream()
+                .map(this::toResponseDto)
+                .toList();
+    }
+
+    private ConsultaResponseDto toResponseDto(Consulta consulta) {
+        return new ConsultaResponseDto(
+                consulta.getId(),
+                consulta.getPaciente().getId(),
+                consulta.getPaciente().getNome(),
+                consulta.getDentista().getId(),
+                consulta.getDentista().getNome(),
+                consulta.getUsuario().getNome(),
+                consulta.getDescricao(),
+                consulta.getDataInicio(),
+                consulta.getDataFim(),
+                consulta.getStatus().name(),
+                consulta.getMotivoCancelamento()
+        );
     }
 }
