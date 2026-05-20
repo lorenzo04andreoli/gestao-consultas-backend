@@ -193,4 +193,69 @@ public class ConsultaService {
                 consulta.getMotivoCancelamento()
         );
     }
+
+    public ConsultaResponseDto editar(Long id, ConsultaRequestDto dto) {
+        Consulta consulta = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Consulta não encontrada"));
+        validarAcessoDentista(consulta);
+
+        if (consulta.getStatus() == StatusConsulta.CANCELADA) {
+            throw new RuntimeException("Consulta cancelada não pode ser editada");
+        }
+
+        if (consulta.getStatus() == StatusConsulta.FINALIZADA) {
+            throw new RuntimeException("Consulta finalizada não pode ser editada");
+        }
+
+        Paciente paciente = pacienteRepository.findById(dto.getPacienteId())
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+
+        Dentista dentista = dentistaRepository.findById(dto.getDentistaId())
+                .orElseThrow(() -> new RuntimeException("Dentista não encontrado"));
+        Usuario usuario = getUsuarioAutenticado();
+
+        if (isDentista(usuario) && !dentista.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Dentista nao pode transferir consulta para outro dentista");
+        }
+
+        consulta.setPaciente(paciente);
+        consulta.setDentista(dentista);
+        consulta.setDescricao(dto.getDescricao());
+        consulta.setDataInicio(dto.getDataInicio());
+        consulta.setDataFim(dto.getDataFim());
+
+        validarEdicao(usuario, dentista, consulta);
+
+        return toResponseDto(repository.save(consulta));
+    }
+
+    private void validarEdicao(Usuario usuario, Dentista dentista, Consulta consulta) {
+        if (!dentista.getAtivo()) {
+            throw new RuntimeException("Dentista esta inativo");
+        }
+
+        if (!usuario.getAtivo()) {
+            throw new RuntimeException("Usuario esta inativo");
+        }
+
+        if (consulta.getDataInicio().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Data de inicio nao pode ser no passado");
+        }
+
+        if (!consulta.getDataFim().isAfter(consulta.getDataInicio())) {
+            throw new RuntimeException("Data de fim deve ser apos a data de inicio");
+        }
+
+        boolean conflito = repository.existeConflitoAoEditar(
+                consulta.getId(),
+                dentista,
+                consulta.getDataInicio(),
+                consulta.getDataFim(),
+                StatusConsulta.CANCELADA
+        );
+
+        if (conflito) {
+            throw new RuntimeException("Dentista ja possui uma consulta nesse horario");
+        }
+    }
 }
