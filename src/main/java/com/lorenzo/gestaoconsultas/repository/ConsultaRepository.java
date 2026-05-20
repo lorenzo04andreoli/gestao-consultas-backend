@@ -26,6 +26,22 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
             @Param("statusIgnorado") StatusConsulta statusIgnorado
     );
 
+    @Query("""
+    SELECT COUNT(c) > 0 FROM Consulta c
+    WHERE c.id <> :consultaId
+    AND c.dentista = :dentista
+    AND c.status <> :statusIgnorado
+    AND c.dataInicio < :fim
+    AND c.dataFim > :inicio
+    """)
+    boolean existeConflitoAoEditar(
+            @Param("consultaId") Long consultaId,
+            @Param("dentista") Dentista dentista,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            @Param("statusIgnorado") StatusConsulta statusIgnorado
+    );
+
 
     List<Consulta> findByDentistaUsuarioId(Long usuarioId);
 

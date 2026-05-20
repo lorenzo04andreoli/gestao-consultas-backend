@@ -35,6 +35,12 @@ public class ConsultaController {
         return service.cancelar(id, motivo);
     }
 
+    @PutMapping("/{id}/editar")
+    public ConsultaResponseDto editar(@PathVariable Long id,
+                                     @RequestBody @Valid ConsultaRequestDto dto) {
+        return service.editar(id, dto);
+    }
+
     @PutMapping("/{id}/finalizar")
     public ConsultaResponseDto finalizar(@PathVariable Long id) {
         return service.finalizar(id);
