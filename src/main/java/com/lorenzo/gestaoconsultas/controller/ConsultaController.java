@@ -51,6 +51,7 @@ public class ConsultaController {
             @RequestParam(required = false) Long pacienteId,
             @RequestParam(required = false) Long dentistaId,
             @RequestParam(required = false) Long especialidadeId,
+            @RequestParam(required = false) Long usuarioId,
             @RequestParam(required = false) String dataInicio,
             @RequestParam(required = false) String dataFim
     ) {
@@ -58,6 +59,6 @@ public class ConsultaController {
         LocalDateTime inicio = dataInicio != null ? LocalDateTime.parse(dataInicio) : null;
         LocalDateTime fim = dataFim != null ? LocalDateTime.parse(dataFim) : null;
 
-        return service.filtrar(pacienteId, dentistaId, especialidadeId, inicio, fim);
+        return service.filtrar(pacienteId, dentistaId, especialidadeId, usuarioId, inicio, fim);
     }
 }

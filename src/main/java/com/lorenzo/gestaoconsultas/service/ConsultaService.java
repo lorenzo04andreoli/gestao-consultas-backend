@@ -107,7 +107,7 @@ public class ConsultaService {
     }
 
     public List<ConsultaResponseDto> filtrar(Long pacienteId, Long dentistaId, Long especialidadeId,
-                                             LocalDateTime inicio, LocalDateTime fim) {
+                                             Long usuarioId, LocalDateTime inicio, LocalDateTime fim) {
         Usuario usuario = getUsuarioAutenticado();
         Long usuarioDentistaId = isDentista(usuario) ? usuario.getId() : null;
 
@@ -116,6 +116,7 @@ public class ConsultaService {
                 pacienteId,
                 dentistaId,
                 especialidadeId,
+                usuarioId,
                 inicio,
                 fim
         ));

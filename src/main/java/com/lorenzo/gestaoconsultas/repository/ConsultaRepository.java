@@ -75,6 +75,7 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
     AND (:pacienteId IS NULL OR c.paciente.id = :pacienteId)
     AND (:dentistaId IS NULL OR d.id = :dentistaId)
     AND (:especialidadeId IS NULL OR e.id = :especialidadeId)
+    AND (:usuarioId IS NULL OR c.usuario.id = :usuarioId)
     AND (:inicio IS NULL OR c.dataInicio >= :inicio)
     AND (:fim IS NULL OR c.dataFim <= :fim)
     """)
@@ -83,6 +84,7 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
             @Param("pacienteId") Long pacienteId,
             @Param("dentistaId") Long dentistaId,
             @Param("especialidadeId") Long especialidadeId,
+            @Param("usuarioId") Long usuarioId,
             @Param("inicio") LocalDateTime inicio,
             @Param("fim") LocalDateTime fim
     );
