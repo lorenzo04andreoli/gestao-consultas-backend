@@ -23,6 +23,14 @@ public class UsuarioService {
 
 
     public UsuarioResponseDto salvar(Usuario usuario){
+        repository.findByEmail(usuario.getEmail()).ifPresent(u -> {
+            throw new RuntimeException("Email ja cadastrado");
+        });
+
+        repository.findByCpf(usuario.getCpf()).ifPresent(u -> {
+            throw new RuntimeException("CPF ja cadastrado");
+        });
+
         usuario.setSenha(encoder.encode(usuario.getSenha()));
         Usuario salvo = repository.save(usuario);
         return new UsuarioResponseDto(
