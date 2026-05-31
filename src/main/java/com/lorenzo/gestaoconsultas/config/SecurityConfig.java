@@ -56,7 +56,10 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
 
                         .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
-                        .requestMatchers("/dentistas", "/dentistas/**").hasAnyRole("ADMIN", "DENTISTA")
+                        .requestMatchers(HttpMethod.GET, "/dentistas", "/dentistas/**").hasAnyRole("ADMIN", "DENTISTA")
+                        .requestMatchers(HttpMethod.POST, "/dentistas").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/dentistas/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/dentistas/**").hasRole("ADMIN")
                         .requestMatchers("/pacientes", "/pacientes/**").hasAnyRole("ADMIN", "DENTISTA")
                         .requestMatchers("/consultas", "/consultas/**").hasAnyRole("ADMIN", "DENTISTA")
                         .requestMatchers("/especialidades", "/especialidades/**").hasAnyRole("ADMIN", "DENTISTA")
