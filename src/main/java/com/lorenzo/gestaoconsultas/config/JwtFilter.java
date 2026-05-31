@@ -51,7 +51,6 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             String email = jwtService.extrairEmail(token);
-            String perfil = jwtService.extrairPerfil(token);
 
             // BUSCA USUÁRIO NO BANCO
             Usuario usuario = usuarioRepository.findByEmail(email)
@@ -67,7 +66,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(
                             email,
                             null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + perfil))
+                            List.of(new SimpleGrantedAuthority("ROLE_" + usuario.getPerfil()))
                     );
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
