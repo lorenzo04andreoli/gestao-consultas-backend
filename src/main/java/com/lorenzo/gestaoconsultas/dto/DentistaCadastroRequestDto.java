@@ -1,0 +1,59 @@
+package com.lorenzo.gestaoconsultas.dto;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
+
+public class DentistaCadastroRequestDto {
+
+    @NotBlank
+    private String nome;
+
+    @NotBlank
+    private String cpf;
+
+    @Email
+    @NotBlank
+    private String email;
+
+    @NotBlank
+    private String senha;
+
+    @NotBlank
+    private String cro;
+
+    private Boolean ativo = true;
+
+    @NotNull
+    private List<Long> especialidadeIds;
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public String getCro() {
+        return cro;
+    }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public List<Long> getEspecialidadeIds() {
+        return especialidadeIds;
+    }
+}
