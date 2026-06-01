@@ -216,7 +216,6 @@ public class DentistaService {
         usuario.setNome(dentista.getNome());
         usuario.setCpf(dentista.getCpf());
         usuario.setEmail(dentista.getEmail());
-        usuario.setAtivo(dentista.getAtivo());
 
         usuarioRepository.save(usuario);
     }
