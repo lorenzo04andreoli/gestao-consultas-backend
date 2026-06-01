@@ -37,8 +37,10 @@ public class UsuarioController {
         return new UsuarioResponseDto(
                 u.getId(),
                 u.getNome(),
+                u.getCpf(),
                 u.getEmail(),
-                u.getPerfil()
+                u.getPerfil(),
+                u.getAtivo()
         );
     }
 
