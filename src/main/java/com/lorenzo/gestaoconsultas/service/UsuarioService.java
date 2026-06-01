@@ -2,6 +2,7 @@ package com.lorenzo.gestaoconsultas.service;
 
 import com.lorenzo.gestaoconsultas.dto.UsuarioAtualizacaoRequestDto;
 import com.lorenzo.gestaoconsultas.entity.Usuario;
+import com.lorenzo.gestaoconsultas.repository.DentistaRepository;
 import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,12 +14,16 @@ import java.util.List;
 public class UsuarioService {
 
     private final UsuarioRepository repository;
+    private final DentistaRepository dentistaRepository;
 
     private final BCryptPasswordEncoder encoder;
 
-    public UsuarioService(UsuarioRepository repository, BCryptPasswordEncoder encoder) {
+    public UsuarioService(UsuarioRepository repository,
+                          DentistaRepository dentistaRepository,
+                          BCryptPasswordEncoder encoder) {
         this.encoder = encoder;
         this.repository = repository;
+        this.dentistaRepository = dentistaRepository;
     }
 
 
@@ -67,6 +72,14 @@ public class UsuarioService {
 
     public UsuarioResponseDto atualizar(Long id, UsuarioAtualizacaoRequestDto dto) {
         Usuario usuario = buscarPorId(id);
+
+        dentistaRepository.findByUsuarioId(id).ifPresent(d -> {
+            throw new RuntimeException("Usuario vinculado a dentista deve ser editado pela tela de dentistas");
+        });
+
+        if ("DENTISTA".equals(dto.getPerfil())) {
+            throw new RuntimeException("Perfil DENTISTA deve ser gerenciado pela tela de dentistas");
+        }
 
         repository.findByEmail(dto.getEmail())
                 .filter(u -> !u.getId().equals(id))
