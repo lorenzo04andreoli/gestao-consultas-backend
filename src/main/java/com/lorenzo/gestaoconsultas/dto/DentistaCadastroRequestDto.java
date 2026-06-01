@@ -2,7 +2,7 @@ package com.lorenzo.gestaoconsultas.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class DentistaCadastroRequestDto {
 
     private Boolean ativo = true;
 
-    @NotNull
+    @NotEmpty
     private List<Long> especialidadeIds;
 
     public String getNome() {
