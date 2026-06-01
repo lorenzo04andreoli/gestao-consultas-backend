@@ -117,6 +117,8 @@ public class DentistaService {
             existente.setUsuario(usuario);
         }
 
+        sincronizarUsuarioVinculado(existente);
+
         if (dentista.getEspecialidades() != null) {
             existente.setEspecialidades(dentista.getEspecialidades());
         }
@@ -204,6 +206,33 @@ public class DentistaService {
         }
 
         return especialidades;
+    }
+
+    private void sincronizarUsuarioVinculado(Dentista dentista) {
+        Usuario usuario = dentista.getUsuario();
+
+        validarDuplicidadeUsuarioAtualizacao(usuario.getId(), dentista);
+
+        usuario.setNome(dentista.getNome());
+        usuario.setCpf(dentista.getCpf());
+        usuario.setEmail(dentista.getEmail());
+        usuario.setAtivo(dentista.getAtivo());
+
+        usuarioRepository.save(usuario);
+    }
+
+    private void validarDuplicidadeUsuarioAtualizacao(Long usuarioId, Dentista dentista) {
+        usuarioRepository.findByEmail(dentista.getEmail())
+                .filter(u -> !u.getId().equals(usuarioId))
+                .ifPresent(u -> {
+                    throw new RuntimeException("Email ja cadastrado");
+                });
+
+        usuarioRepository.findByCpf(dentista.getCpf())
+                .filter(u -> !u.getId().equals(usuarioId))
+                .ifPresent(u -> {
+                    throw new RuntimeException("CPF ja cadastrado");
+                });
     }
 
     private void validarDuplicidadeAtualizacao(Long id, Dentista dentista) {
