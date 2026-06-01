@@ -1,5 +1,6 @@
 package com.lorenzo.gestaoconsultas.dto;
 
+import com.lorenzo.gestaoconsultas.validation.CPF;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -12,6 +13,7 @@ public class DentistaCadastroRequestDto {
     private String nome;
 
     @NotBlank
+    @CPF
     private String cpf;
 
     @Email

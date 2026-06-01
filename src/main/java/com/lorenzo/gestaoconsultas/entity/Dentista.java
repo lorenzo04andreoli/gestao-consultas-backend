@@ -1,5 +1,6 @@
 package com.lorenzo.gestaoconsultas.entity;
 
+import com.lorenzo.gestaoconsultas.validation.CPF;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ public class Dentista {
     private String nome;
 
     @NotBlank
+    @CPF
     @Column(unique = true)
     private String cpf;
 
