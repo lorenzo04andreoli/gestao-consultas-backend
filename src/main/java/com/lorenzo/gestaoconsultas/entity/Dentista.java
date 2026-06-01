@@ -37,8 +37,8 @@ public class Dentista {
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
     @NotNull
     private Usuario usuario;
 
