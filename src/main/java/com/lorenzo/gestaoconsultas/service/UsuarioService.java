@@ -23,6 +23,10 @@ public class UsuarioService {
 
 
     public UsuarioResponseDto salvar(Usuario usuario){
+        if ("DENTISTA".equals(usuario.getPerfil())) {
+            throw new RuntimeException("Usuario dentista deve ser cadastrado pela tela de dentistas");
+        }
+
         repository.findByEmail(usuario.getEmail()).ifPresent(u -> {
             throw new RuntimeException("Email ja cadastrado");
         });
