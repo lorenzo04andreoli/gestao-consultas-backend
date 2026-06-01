@@ -1,6 +1,6 @@
 package com.lorenzo.gestaoconsultas.controller;
 
-
+import com.lorenzo.gestaoconsultas.dto.UsuarioAtualizacaoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.UsuarioResponseDto;
 import com.lorenzo.gestaoconsultas.entity.Usuario;
 import com.lorenzo.gestaoconsultas.service.UsuarioService;
@@ -40,6 +40,17 @@ public class UsuarioController {
                 u.getEmail(),
                 u.getPerfil()
         );
+    }
+
+    @PutMapping("/{id}")
+    public UsuarioResponseDto atualizar(@PathVariable Long id,
+                                        @RequestBody @Valid UsuarioAtualizacaoRequestDto dto) {
+        return service.atualizar(id, dto);
+    }
+
+    @PutMapping("/{id}/desativar")
+    public UsuarioResponseDto desativar(@PathVariable Long id) {
+        return service.desativar(id);
     }
 
     @DeleteMapping("/{id}")

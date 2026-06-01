@@ -1,11 +1,11 @@
 package com.lorenzo.gestaoconsultas.service;
 
+import com.lorenzo.gestaoconsultas.dto.UsuarioAtualizacaoRequestDto;
 import com.lorenzo.gestaoconsultas.entity.Usuario;
 import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.lorenzo.gestaoconsultas.dto.UsuarioResponseDto;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -57,7 +57,46 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
     }
 
+    public UsuarioResponseDto atualizar(Long id, UsuarioAtualizacaoRequestDto dto) {
+        Usuario usuario = buscarPorId(id);
+
+        repository.findByEmail(dto.getEmail())
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> {
+                    throw new RuntimeException("Email ja cadastrado");
+                });
+
+        repository.findByCpf(dto.getCpf())
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> {
+                    throw new RuntimeException("CPF ja cadastrado");
+                });
+
+        usuario.setNome(dto.getNome());
+        usuario.setCpf(dto.getCpf());
+        usuario.setEmail(dto.getEmail());
+        usuario.setPerfil(dto.getPerfil());
+        usuario.setAtivo(dto.getAtivo() == null || dto.getAtivo());
+
+        return toResponseDto(repository.save(usuario));
+    }
+
+    public UsuarioResponseDto desativar(Long id) {
+        Usuario usuario = buscarPorId(id);
+        usuario.setAtivo(false);
+        return toResponseDto(repository.save(usuario));
+    }
+
     public void deletar(Long id) {
         repository.deleteById(id);
+    }
+
+    private UsuarioResponseDto toResponseDto(Usuario usuario) {
+        return new UsuarioResponseDto(
+                usuario.getId(),
+                usuario.getNome(),
+                usuario.getEmail(),
+                usuario.getPerfil()
+        );
     }
 }
