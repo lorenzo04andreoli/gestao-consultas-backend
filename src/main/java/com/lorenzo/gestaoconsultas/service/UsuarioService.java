@@ -36,8 +36,10 @@ public class UsuarioService {
         return new UsuarioResponseDto(
                 salvo.getId(),
                 salvo.getNome(),
+                salvo.getCpf(),
                 salvo.getEmail(),
-                salvo.getPerfil()
+                salvo.getPerfil(),
+                salvo.getAtivo()
         );
     }
 
@@ -46,8 +48,10 @@ public class UsuarioService {
                 .map(u -> new UsuarioResponseDto(
                         u.getId(),
                         u.getNome(),
+                        u.getCpf(),
                         u.getEmail(),
-                        u.getPerfil()
+                        u.getPerfil(),
+                        u.getAtivo()
                 ))
                 .toList();
     }
@@ -95,8 +99,10 @@ public class UsuarioService {
         return new UsuarioResponseDto(
                 usuario.getId(),
                 usuario.getNome(),
+                usuario.getCpf(),
                 usuario.getEmail(),
-                usuario.getPerfil()
+                usuario.getPerfil(),
+                usuario.getAtivo()
         );
     }
 }
