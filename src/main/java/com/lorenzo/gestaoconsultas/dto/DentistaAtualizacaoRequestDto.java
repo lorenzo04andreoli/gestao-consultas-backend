@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
-public class DentistaCadastroRequestDto {
+public class DentistaAtualizacaoRequestDto {
 
     @NotBlank
     private String nome;
@@ -19,9 +19,6 @@ public class DentistaCadastroRequestDto {
     @Email
     @NotBlank
     private String email;
-
-    @NotBlank
-    private String senha;
 
     @NotBlank
     private String cro;
@@ -41,10 +38,6 @@ public class DentistaCadastroRequestDto {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getSenha() {
-        return senha;
     }
 
     public String getCro() {

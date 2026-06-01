@@ -1,5 +1,6 @@
 package com.lorenzo.gestaoconsultas.service;
 
+import com.lorenzo.gestaoconsultas.dto.DentistaAtualizacaoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.DentistaCadastroRequestDto;
 import com.lorenzo.gestaoconsultas.dto.DentistaResponseDto;
 import com.lorenzo.gestaoconsultas.entity.Dentista;
@@ -76,28 +77,25 @@ public class DentistaService {
         return toResponseDto(buscarPorId(id));
     }
 
-    public Dentista atualizar(Long id, Dentista dentista) {
+    public Dentista atualizar(Long id, DentistaAtualizacaoRequestDto dto) {
         Dentista existente = buscarPorId(id);
 
-        validarDuplicidadeAtualizacao(id, dentista);
+        validarDuplicidadeAtualizacao(id, dto);
 
-        existente.setNome(dentista.getNome());
-        existente.setEmail(dentista.getEmail());
-        existente.setCpf(dentista.getCpf());
-        existente.setCro(dentista.getCro());
-        existente.setAtivo(dentista.getAtivo());
+        existente.setNome(dto.getNome());
+        existente.setEmail(dto.getEmail());
+        existente.setCpf(dto.getCpf());
+        existente.setCro(dto.getCro());
+        existente.setAtivo(dto.getAtivo() == null || dto.getAtivo());
+        existente.setEspecialidades(buscarEspecialidades(dto.getEspecialidadeIds()));
 
         sincronizarUsuarioVinculado(existente);
-
-        if (dentista.getEspecialidades() != null) {
-            existente.setEspecialidades(dentista.getEspecialidades());
-        }
 
         return repository.save(existente);
     }
 
-    public DentistaResponseDto atualizarResponse(Long id, Dentista dentista) {
-        return toResponseDto(atualizar(id, dentista));
+    public DentistaResponseDto atualizarResponse(Long id, DentistaAtualizacaoRequestDto dto) {
+        return toResponseDto(atualizar(id, dto));
     }
 
     public void deletar(Long id) {
@@ -171,20 +169,20 @@ public class DentistaService {
                 });
     }
 
-    private void validarDuplicidadeAtualizacao(Long id, Dentista dentista) {
-        repository.findByEmail(dentista.getEmail())
+    private void validarDuplicidadeAtualizacao(Long id, DentistaAtualizacaoRequestDto dto) {
+        repository.findByEmail(dto.getEmail())
                 .filter(d -> !d.getId().equals(id))
                 .ifPresent(d -> {
                     throw new RuntimeException("Email ja cadastrado");
                 });
 
-        repository.findByCpf(dentista.getCpf())
+        repository.findByCpf(dto.getCpf())
                 .filter(d -> !d.getId().equals(id))
                 .ifPresent(d -> {
                     throw new RuntimeException("CPF ja cadastrado");
                 });
 
-        repository.findByCro(dentista.getCro())
+        repository.findByCro(dto.getCro())
                 .filter(d -> !d.getId().equals(id))
                 .ifPresent(d -> {
                     throw new RuntimeException("CRO ja cadastrado");

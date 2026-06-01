@@ -1,8 +1,8 @@
 package com.lorenzo.gestaoconsultas.controller;
 
+import com.lorenzo.gestaoconsultas.dto.DentistaAtualizacaoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.DentistaCadastroRequestDto;
 import com.lorenzo.gestaoconsultas.dto.DentistaResponseDto;
-import com.lorenzo.gestaoconsultas.entity.Dentista;
 import com.lorenzo.gestaoconsultas.service.DentistaService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +36,9 @@ public class DentistaController {
     }
 
     @PutMapping("/{id}")
-    public DentistaResponseDto atualizar(@PathVariable Long id, @RequestBody @Valid Dentista dentista) {
-        return service.atualizarResponse(id, dentista);
+    public DentistaResponseDto atualizar(@PathVariable Long id,
+                                         @RequestBody @Valid DentistaAtualizacaoRequestDto dto) {
+        return service.atualizarResponse(id, dto);
     }
 
     @DeleteMapping("/{id}")
