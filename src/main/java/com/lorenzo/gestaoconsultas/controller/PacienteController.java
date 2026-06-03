@@ -44,6 +44,11 @@ public class PacienteController {
         return service.desativar(id);
     }
 
+    @PutMapping("/{id}/reativar")
+    public Paciente reativar(@PathVariable Long id) {
+        return service.reativar(id);
+    }
+
     @DeleteMapping("/{id}")
     public Paciente deletar(@PathVariable Long id) {
         return service.deletar(id);
