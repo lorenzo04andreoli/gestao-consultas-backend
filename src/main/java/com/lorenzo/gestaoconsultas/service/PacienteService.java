@@ -46,11 +46,18 @@ public class PacienteService {
         existente.setEmail(paciente.getEmail());
         existente.setCpf(paciente.getCpf());
         existente.setTelefone(paciente.getTelefone());
+        existente.setAtivo(paciente.getAtivo() == null || paciente.getAtivo());
 
         return repository.save(existente);
     }
 
-     public void deletar(Long id) {
-        repository.deleteById(id);
+    public Paciente desativar(Long id) {
+        Paciente paciente = buscarPorId(id);
+        paciente.setAtivo(false);
+        return repository.save(paciente);
+    }
+
+     public Paciente deletar(Long id) {
+        return desativar(id);
     }
 }
