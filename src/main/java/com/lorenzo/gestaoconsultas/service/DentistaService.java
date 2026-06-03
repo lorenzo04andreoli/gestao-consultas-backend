@@ -62,6 +62,13 @@ public class DentistaService {
         return toResponseDto(repository.save(dentista));
     }
 
+    @Transactional
+    public DentistaResponseDto desativar(Long id) {
+        Dentista dentista = buscarPorId(id);
+        dentista.setAtivo(false);
+        return toResponseDto(repository.save(dentista));
+    }
+
     public List<DentistaResponseDto> listar() {
         return repository.findAll().stream()
                 .map(this::toResponseDto)

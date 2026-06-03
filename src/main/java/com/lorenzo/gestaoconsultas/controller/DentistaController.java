@@ -45,4 +45,9 @@ public class DentistaController {
     public void deletar(@PathVariable Long id) {
         service.deletar(id);
     }
+
+    @PutMapping("/{id}/desativar")
+    public DentistaResponseDto desativar(@PathVariable Long id) {
+        return service.desativar(id);
+    }
 }

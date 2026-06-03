@@ -2,7 +2,6 @@ package com.lorenzo.gestaoconsultas.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.lorenzo.gestaoconsultas.validation.CPF;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -21,7 +20,6 @@ public class Usuario {
     private String nome;
 
     @NotBlank
-    @CPF
     @Column(unique = true)
     private String cpf;
 

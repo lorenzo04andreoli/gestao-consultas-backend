@@ -1,6 +1,5 @@
 package com.lorenzo.gestaoconsultas.entity;
 
-import com.lorenzo.gestaoconsultas.validation.CPF;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -23,11 +22,12 @@ public class Paciente {
     private String email;
 
     @NotBlank
-    @CPF
     @Column(unique = true)
     private String cpf;
 
     private String telefone;
+
+    private Boolean ativo = true;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
@@ -35,12 +35,13 @@ public class Paciente {
 
     public Paciente() {}
 
-    public Paciente(Long id, String nome, String email, String cpf, String telefone, LocalDateTime dataCriacao) {
+    public Paciente(Long id, String nome, String email, String cpf, String telefone, Boolean ativo, LocalDateTime dataCriacao) {
         this.setId(id);
         this.setNome(nome);
         this.setEmail(email);
         this.setCpf(cpf);
         this.setTelefone(telefone);
+        this.setAtivo(ativo);
         this.setDataCriacao(dataCriacao);
     }
 
@@ -88,6 +89,14 @@ public class Paciente {
 
     public void setTelefone(String telefone) {
         this.telefone = telefone;
+    }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
     }
 
     public LocalDateTime getDataCriacao() {
