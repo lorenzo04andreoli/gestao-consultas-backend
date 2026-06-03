@@ -57,6 +57,12 @@ public class PacienteService {
         return repository.save(paciente);
     }
 
+    public Paciente reativar(Long id) {
+        Paciente paciente = buscarPorId(id);
+        paciente.setAtivo(true);
+        return repository.save(paciente);
+    }
+
      public Paciente deletar(Long id) {
         return desativar(id);
     }

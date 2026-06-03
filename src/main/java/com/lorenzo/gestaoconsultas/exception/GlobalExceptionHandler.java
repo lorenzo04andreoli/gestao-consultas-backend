@@ -84,7 +84,12 @@ public class GlobalExceptionHandler {
             return HttpStatus.UNAUTHORIZED;
         }
 
-        if (normalized.contains("já cadastrado") || normalized.contains("já possui")) {
+        if (normalized.contains("já cadastrado")
+                || normalized.contains("ja cadastrado")
+                || normalized.contains("já possui")
+                || normalized.contains("ja possui")
+                || normalized.contains("vinculada")
+                || normalized.contains("vinculado")) {
             return HttpStatus.CONFLICT;
         }
 

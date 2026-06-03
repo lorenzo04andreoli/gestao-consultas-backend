@@ -50,4 +50,9 @@ public class DentistaController {
     public DentistaResponseDto desativar(@PathVariable Long id) {
         return service.desativar(id);
     }
+
+    @PutMapping("/{id}/reativar")
+    public DentistaResponseDto reativar(@PathVariable Long id) {
+        return service.reativar(id);
+    }
 }
