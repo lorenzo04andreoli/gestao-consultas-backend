@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class FinanceiroService {
@@ -22,6 +23,12 @@ public class FinanceiroService {
                              ConsultaRepository consultaRepository) {
         this.repository = repository;
         this.consultaRepository = consultaRepository;
+    }
+
+    public List<FinanceiroLancamentoResponseDto> listarLancamentos() {
+        return repository.findAllByOrderByDataCriacaoDesc().stream()
+                .map(this::toResponseDto)
+                .toList();
     }
 
     @Transactional
