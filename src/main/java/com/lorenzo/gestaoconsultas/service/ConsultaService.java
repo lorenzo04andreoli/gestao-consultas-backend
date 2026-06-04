@@ -54,7 +54,7 @@ public class ConsultaService {
         consulta.setDataInicio(dto.getDataInicio());
         consulta.setDataFim(dto.getDataFim());
 
-        validarAgendamento(usuario, dentista, consulta);
+        validarAgendamento(usuario, paciente, dentista, consulta);
 
         return toResponseDto(repository.save(consulta));
     }
@@ -122,7 +122,7 @@ public class ConsultaService {
         ));
     }
 
-    private void validarAgendamento(Usuario usuario, Dentista dentista, Consulta consulta) {
+    private void validarAgendamento(Usuario usuario, Paciente paciente, Dentista dentista, Consulta consulta) {
         if (!dentista.getAtivo()) {
             throw new RuntimeException("Dentista está inativo");
         }
@@ -148,6 +148,17 @@ public class ConsultaService {
 
         if (conflito) {
             throw new RuntimeException("Dentista já possui uma consulta nesse horário");
+        }
+
+        boolean conflitoPaciente = repository.existeConflitoPaciente(
+                paciente,
+                consulta.getDataInicio(),
+                consulta.getDataFim(),
+                StatusConsulta.CANCELADA
+        );
+
+        if (conflitoPaciente) {
+            throw new RuntimeException("Paciente ja possui uma consulta nesse horario");
         }
     }
 
@@ -225,12 +236,12 @@ public class ConsultaService {
         consulta.setDataInicio(dto.getDataInicio());
         consulta.setDataFim(dto.getDataFim());
 
-        validarEdicao(usuario, dentista, consulta);
+        validarEdicao(usuario, paciente, dentista, consulta);
 
         return toResponseDto(repository.save(consulta));
     }
 
-    private void validarEdicao(Usuario usuario, Dentista dentista, Consulta consulta) {
+    private void validarEdicao(Usuario usuario, Paciente paciente, Dentista dentista, Consulta consulta) {
         if (!dentista.getAtivo()) {
             throw new RuntimeException("Dentista esta inativo");
         }
@@ -257,6 +268,18 @@ public class ConsultaService {
 
         if (conflito) {
             throw new RuntimeException("Dentista ja possui uma consulta nesse horario");
+        }
+
+        boolean conflitoPaciente = repository.existeConflitoPacienteAoEditar(
+                consulta.getId(),
+                paciente,
+                consulta.getDataInicio(),
+                consulta.getDataFim(),
+                StatusConsulta.CANCELADA
+        );
+
+        if (conflitoPaciente) {
+            throw new RuntimeException("Paciente ja possui uma consulta nesse horario");
         }
     }
 }

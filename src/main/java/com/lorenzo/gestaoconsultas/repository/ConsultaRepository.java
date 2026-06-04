@@ -2,6 +2,7 @@ package com.lorenzo.gestaoconsultas.repository;
 
 import com.lorenzo.gestaoconsultas.entity.Consulta;
 import com.lorenzo.gestaoconsultas.entity.Dentista;
+import com.lorenzo.gestaoconsultas.entity.Paciente;
 import com.lorenzo.gestaoconsultas.enums.StatusConsulta;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,6 +29,20 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
 
     @Query("""
     SELECT COUNT(c) > 0 FROM Consulta c
+    WHERE c.paciente = :paciente
+    AND c.status <> :statusIgnorado
+    AND c.dataInicio < :fim
+    AND c.dataFim > :inicio
+    """)
+    boolean existeConflitoPaciente(
+            @Param("paciente") Paciente paciente,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            @Param("statusIgnorado") StatusConsulta statusIgnorado
+    );
+
+    @Query("""
+    SELECT COUNT(c) > 0 FROM Consulta c
     WHERE c.id <> :consultaId
     AND c.dentista = :dentista
     AND c.status <> :statusIgnorado
@@ -37,6 +52,22 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
     boolean existeConflitoAoEditar(
             @Param("consultaId") Long consultaId,
             @Param("dentista") Dentista dentista,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim,
+            @Param("statusIgnorado") StatusConsulta statusIgnorado
+    );
+
+    @Query("""
+    SELECT COUNT(c) > 0 FROM Consulta c
+    WHERE c.id <> :consultaId
+    AND c.paciente = :paciente
+    AND c.status <> :statusIgnorado
+    AND c.dataInicio < :fim
+    AND c.dataFim > :inicio
+    """)
+    boolean existeConflitoPacienteAoEditar(
+            @Param("consultaId") Long consultaId,
+            @Param("paciente") Paciente paciente,
             @Param("inicio") LocalDateTime inicio,
             @Param("fim") LocalDateTime fim,
             @Param("statusIgnorado") StatusConsulta statusIgnorado
