@@ -5,12 +5,14 @@ import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoResponseDto;
 import com.lorenzo.gestaoconsultas.entity.Consulta;
 import com.lorenzo.gestaoconsultas.entity.FinanceiroLancamento;
 import com.lorenzo.gestaoconsultas.enums.StatusConsulta;
+import com.lorenzo.gestaoconsultas.enums.StatusLancamentoFinanceiro;
 import com.lorenzo.gestaoconsultas.repository.ConsultaRepository;
 import com.lorenzo.gestaoconsultas.repository.FinanceiroLancamentoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,6 +31,10 @@ public class FinanceiroService {
         return repository.findAllByOrderByDataCriacaoDesc().stream()
                 .map(this::toResponseDto)
                 .toList();
+    }
+
+    public FinanceiroLancamentoResponseDto buscarPorId(Long id) {
+        return toResponseDto(buscarLancamentoPorId(id));
     }
 
     @Transactional
@@ -58,6 +64,42 @@ public class FinanceiroService {
         return toResponseDto(repository.save(lancamento));
     }
 
+    @Transactional
+    public FinanceiroLancamentoResponseDto marcarComoPago(Long id) {
+        FinanceiroLancamento lancamento = buscarLancamentoPorId(id);
+
+        if (lancamento.getStatus() == StatusLancamentoFinanceiro.PAGO) {
+            throw new RuntimeException("Cobranca ja esta paga");
+        }
+
+        if (lancamento.getStatus() == StatusLancamentoFinanceiro.CANCELADO) {
+            throw new RuntimeException("Cobranca cancelada nao pode ser paga");
+        }
+
+        lancamento.setStatus(StatusLancamentoFinanceiro.PAGO);
+        lancamento.setDataPagamento(LocalDateTime.now());
+
+        return toResponseDto(repository.save(lancamento));
+    }
+
+    @Transactional
+    public FinanceiroLancamentoResponseDto cancelar(Long id) {
+        FinanceiroLancamento lancamento = buscarLancamentoPorId(id);
+
+        if (lancamento.getStatus() == StatusLancamentoFinanceiro.PAGO) {
+            throw new RuntimeException("Cobranca paga nao pode ser cancelada");
+        }
+
+        if (lancamento.getStatus() == StatusLancamentoFinanceiro.CANCELADO) {
+            throw new RuntimeException("Cobranca ja esta cancelada");
+        }
+
+        lancamento.setStatus(StatusLancamentoFinanceiro.CANCELADO);
+        lancamento.setDataPagamento(null);
+
+        return toResponseDto(repository.save(lancamento));
+    }
+
     private void validarValor(BigDecimal valor) {
         if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("Valor da cobranca deve ser maior que zero");
@@ -68,6 +110,11 @@ public class FinanceiroService {
         if (descricao == null || descricao.trim().isEmpty()) {
             throw new RuntimeException("Descricao da cobranca e obrigatoria");
         }
+    }
+
+    private FinanceiroLancamento buscarLancamentoPorId(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Lancamento financeiro nao encontrado"));
     }
 
     private FinanceiroLancamentoResponseDto toResponseDto(FinanceiroLancamento lancamento) {
