@@ -2,6 +2,7 @@ package com.lorenzo.gestaoconsultas.service;
 
 import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoResponseDto;
+import com.lorenzo.gestaoconsultas.dto.FinanceiroResumoResponseDto;
 import com.lorenzo.gestaoconsultas.entity.Consulta;
 import com.lorenzo.gestaoconsultas.entity.FinanceiroLancamento;
 import com.lorenzo.gestaoconsultas.enums.StatusConsulta;
@@ -12,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,6 +37,33 @@ public class FinanceiroService {
 
     public FinanceiroLancamentoResponseDto buscarPorId(Long id) {
         return toResponseDto(buscarLancamentoPorId(id));
+    }
+
+    public FinanceiroResumoResponseDto resumo() {
+        LocalDateTime inicioMes = LocalDate.now()
+                .withDayOfMonth(1)
+                .atStartOfDay();
+        LocalDateTime inicioProximoMes = inicioMes.plusMonths(1);
+
+        BigDecimal recebidoMes = repository.somarPorStatusEDataPagamento(
+                StatusLancamentoFinanceiro.PAGO,
+                inicioMes,
+                inicioProximoMes
+        );
+
+        BigDecimal aReceber = repository.somarPorStatus(StatusLancamentoFinanceiro.PENDENTE);
+
+        Long pendentes = repository.countByStatus(StatusLancamentoFinanceiro.PENDENTE);
+        Long pagas = repository.countByStatus(StatusLancamentoFinanceiro.PAGO);
+        Long canceladas = repository.countByStatus(StatusLancamentoFinanceiro.CANCELADO);
+
+        return new FinanceiroResumoResponseDto(
+                recebidoMes,
+                aReceber,
+                pendentes,
+                pagas,
+                canceladas
+        );
     }
 
     @Transactional

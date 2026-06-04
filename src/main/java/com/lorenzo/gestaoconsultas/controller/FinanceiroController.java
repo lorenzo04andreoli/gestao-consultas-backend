@@ -2,6 +2,7 @@ package com.lorenzo.gestaoconsultas.controller;
 
 import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoResponseDto;
+import com.lorenzo.gestaoconsultas.dto.FinanceiroResumoResponseDto;
 import com.lorenzo.gestaoconsultas.service.FinanceiroService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,11 @@ public class FinanceiroController {
     @GetMapping("/lancamentos")
     public List<FinanceiroLancamentoResponseDto> listarLancamentos() {
         return service.listarLancamentos();
+    }
+
+    @GetMapping("/resumo")
+    public FinanceiroResumoResponseDto resumo() {
+        return service.resumo();
     }
 
     @GetMapping("/lancamentos/{id}")
