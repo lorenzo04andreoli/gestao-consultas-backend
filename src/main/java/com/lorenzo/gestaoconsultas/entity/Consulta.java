@@ -24,6 +24,10 @@ public class Consulta {
     private Dentista dentista;
 
     @ManyToOne
+    @JoinColumn(name = "id_especialidade")
+    private Especialidade especialidade;
+
+    @ManyToOne
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
@@ -72,6 +76,14 @@ public class Consulta {
 
     public void setDentista(Dentista dentista) {
         this.dentista = dentista;
+    }
+
+    public Especialidade getEspecialidade() {
+        return especialidade;
+    }
+
+    public void setEspecialidade(Especialidade especialidade) {
+        this.especialidade = especialidade;
     }
 
     public Usuario getUsuario() {

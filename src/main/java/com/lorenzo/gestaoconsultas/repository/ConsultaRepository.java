@@ -92,16 +92,14 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Long> {
 
     @Query("""
     SELECT c FROM Consulta c
-    JOIN c.dentista d
-    JOIN d.especialidades e
-    WHERE e.id = :especialidadeId
+    WHERE c.especialidade.id = :especialidadeId
     """)
     List<Consulta> filtrarPorEspecialidade(@Param("especialidadeId") Long especialidadeId);
 
     @Query("""
     SELECT DISTINCT c FROM Consulta c
     JOIN c.dentista d
-    LEFT JOIN d.especialidades e
+    LEFT JOIN c.especialidade e
     WHERE (:usuarioDentistaId IS NULL OR d.usuario.id = :usuarioDentistaId)
     AND (:pacienteId IS NULL OR c.paciente.id = :pacienteId)
     AND (:dentistaId IS NULL OR d.id = :dentistaId)
