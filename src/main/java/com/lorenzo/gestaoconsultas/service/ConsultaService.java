@@ -4,11 +4,13 @@ import com.lorenzo.gestaoconsultas.dto.ConsultaRequestDto;
 import com.lorenzo.gestaoconsultas.dto.ConsultaResponseDto;
 import com.lorenzo.gestaoconsultas.entity.Consulta;
 import com.lorenzo.gestaoconsultas.entity.Dentista;
+import com.lorenzo.gestaoconsultas.entity.Especialidade;
 import com.lorenzo.gestaoconsultas.entity.Paciente;
 import com.lorenzo.gestaoconsultas.entity.Usuario;
 import com.lorenzo.gestaoconsultas.enums.StatusConsulta;
 import com.lorenzo.gestaoconsultas.repository.ConsultaRepository;
 import com.lorenzo.gestaoconsultas.repository.DentistaRepository;
+import com.lorenzo.gestaoconsultas.repository.EspecialidadeRepository;
 import com.lorenzo.gestaoconsultas.repository.PacienteRepository;
 import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,12 +26,15 @@ public class ConsultaService {
     private final UsuarioRepository usuarioRepository;
     private final PacienteRepository pacienteRepository;
     private final DentistaRepository dentistaRepository;
+    private final EspecialidadeRepository especialidadeRepository;
 
     public ConsultaService(ConsultaRepository repository, UsuarioRepository usuarioRepository,
-                           PacienteRepository pacienteRepository, DentistaRepository dentistaRepository) {
+                           PacienteRepository pacienteRepository, DentistaRepository dentistaRepository,
+                           EspecialidadeRepository especialidadeRepository) {
         this.dentistaRepository = dentistaRepository;
         this.pacienteRepository = pacienteRepository;
         this.usuarioRepository = usuarioRepository;
+        this.especialidadeRepository = especialidadeRepository;
         this.repository = repository;
     }
 
@@ -42,6 +47,9 @@ public class ConsultaService {
         Dentista dentista = dentistaRepository.findById(dto.getDentistaId())
                 .orElseThrow(() -> new RuntimeException("Dentista não encontrado"));
 
+        Especialidade especialidade = buscarEspecialidade(dto.getEspecialidadeId());
+        validarEspecialidadeDoDentista(dentista, especialidade);
+
         if (isDentista(usuario) && !dentista.getUsuario().getId().equals(usuario.getId())) {
             throw new RuntimeException("Dentista não pode agendar consultas para outro dentista");
         }
@@ -50,6 +58,7 @@ public class ConsultaService {
         consulta.setUsuario(usuario);
         consulta.setPaciente(paciente);
         consulta.setDentista(dentista);
+        consulta.setEspecialidade(especialidade);
         consulta.setDescricao(dto.getDescricao());
         consulta.setDataInicio(dto.getDataInicio());
         consulta.setDataFim(dto.getDataFim());
@@ -184,6 +193,21 @@ public class ConsultaService {
         }
     }
 
+    private Especialidade buscarEspecialidade(Long especialidadeId) {
+        return especialidadeRepository.findById(especialidadeId)
+                .orElseThrow(() -> new RuntimeException("Especialidade nao encontrada"));
+    }
+
+    private void validarEspecialidadeDoDentista(Dentista dentista, Especialidade especialidade) {
+        boolean pertenceAoDentista = dentista.getEspecialidades() != null
+                && dentista.getEspecialidades().stream()
+                        .anyMatch(e -> e.getId().equals(especialidade.getId()));
+
+        if (!pertenceAoDentista) {
+            throw new RuntimeException("Especialidade nao pertence ao dentista selecionado");
+        }
+    }
+
     private List<ConsultaResponseDto> toResponseDtoList(List<Consulta> consultas) {
         return consultas.stream()
                 .map(this::toResponseDto)
@@ -191,12 +215,16 @@ public class ConsultaService {
     }
 
     private ConsultaResponseDto toResponseDto(Consulta consulta) {
+        Especialidade especialidade = consulta.getEspecialidade();
+
         return new ConsultaResponseDto(
                 consulta.getId(),
                 consulta.getPaciente().getId(),
                 consulta.getPaciente().getNome(),
                 consulta.getDentista().getId(),
                 consulta.getDentista().getNome(),
+                especialidade == null ? null : especialidade.getId(),
+                especialidade == null ? null : especialidade.getNome(),
                 consulta.getUsuario().getNome(),
                 consulta.getDescricao(),
                 consulta.getDataInicio(),
@@ -230,8 +258,12 @@ public class ConsultaService {
             throw new RuntimeException("Dentista nao pode transferir consulta para outro dentista");
         }
 
+        Especialidade especialidade = buscarEspecialidade(dto.getEspecialidadeId());
+        validarEspecialidadeDoDentista(dentista, especialidade);
+
         consulta.setPaciente(paciente);
         consulta.setDentista(dentista);
+        consulta.setEspecialidade(especialidade);
         consulta.setDescricao(dto.getDescricao());
         consulta.setDataInicio(dto.getDataInicio());
         consulta.setDataFim(dto.getDataFim());

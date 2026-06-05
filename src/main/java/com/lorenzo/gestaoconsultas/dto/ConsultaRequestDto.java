@@ -13,6 +13,9 @@ public class ConsultaRequestDto {
     @NotNull
     private Long dentistaId;
 
+    @NotNull
+    private Long especialidadeId;
+
     @NotBlank
     private String descricao;
 
@@ -24,6 +27,7 @@ public class ConsultaRequestDto {
 
     public Long getPacienteId() { return pacienteId; }
     public Long getDentistaId() { return dentistaId; }
+    public Long getEspecialidadeId() { return especialidadeId; }
     public String getDescricao() { return descricao; }
     public LocalDateTime getDataInicio() { return dataInicio; }
     public LocalDateTime getDataFim() { return dataFim; }
