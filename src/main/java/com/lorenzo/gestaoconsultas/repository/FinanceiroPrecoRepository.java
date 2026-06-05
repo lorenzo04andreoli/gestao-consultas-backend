@@ -10,12 +10,12 @@ public interface FinanceiroPrecoRepository extends JpaRepository<FinanceiroPreco
 
     List<FinanceiroPreco> findByTabelaPrecoIdOrderByEspecialidadeNomeAsc(Long tabelaPrecoId);
 
-    Optional<FinanceiroPreco> findFirstByTabelaPrecoAtivoTrueAndAtivoTrueAndEspecialidadeIdAndDentistaId(
+    Optional<FinanceiroPreco> findFirstByTabelaPrecoAtivoTrueAndAtivoTrueAndEspecialidadeIdAndDentistaIdOrderByTabelaPrecoIdDesc(
             Long especialidadeId,
             Long dentistaId
     );
 
-    Optional<FinanceiroPreco> findFirstByTabelaPrecoAtivoTrueAndAtivoTrueAndEspecialidadeIdAndDentistaIsNull(
+    Optional<FinanceiroPreco> findFirstByTabelaPrecoAtivoTrueAndAtivoTrueAndEspecialidadeIdAndDentistaIsNullOrderByTabelaPrecoIdDesc(
             Long especialidadeId
     );
 

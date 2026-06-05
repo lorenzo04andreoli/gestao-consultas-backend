@@ -4,6 +4,7 @@ import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoResponseDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroPrecoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroPrecoResponseDto;
+import com.lorenzo.gestaoconsultas.dto.FinanceiroPrecoSugestaoResponseDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroResumoResponseDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroTabelaPrecoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroTabelaPrecoResponseDto;
@@ -61,6 +62,28 @@ public class FinanceiroService {
 
     public FinanceiroLancamentoResponseDto buscarPorId(Long id) {
         return toResponseDto(buscarLancamentoPorId(id));
+    }
+
+    public FinanceiroPrecoSugestaoResponseDto sugerirPreco(Long dentistaId, Long especialidadeId) {
+        Dentista dentista = dentistaRepository.findById(dentistaId)
+                .orElseThrow(() -> new RuntimeException("Dentista nao encontrado"));
+        Especialidade especialidade = especialidadeRepository.findById(especialidadeId)
+                .orElseThrow(() -> new RuntimeException("Especialidade nao encontrada"));
+
+        validarEspecialidadeDoDentista(dentista, especialidade);
+
+        return precoRepository
+                .findFirstByTabelaPrecoAtivoTrueAndAtivoTrueAndEspecialidadeIdAndDentistaIdOrderByTabelaPrecoIdDesc(
+                        especialidade.getId(),
+                        dentista.getId()
+                )
+                .map(preco -> toSugestaoResponseDto(preco, "DENTISTA"))
+                .or(() -> precoRepository
+                        .findFirstByTabelaPrecoAtivoTrueAndAtivoTrueAndEspecialidadeIdAndDentistaIsNullOrderByTabelaPrecoIdDesc(
+                                especialidade.getId()
+                        )
+                        .map(preco -> toSugestaoResponseDto(preco, "ESPECIALIDADE")))
+                .orElseGet(() -> new FinanceiroPrecoSugestaoResponseDto(false, null, null, null, null));
     }
 
     public List<FinanceiroTabelaPrecoResponseDto> listarTabelasPreco() {
@@ -270,6 +293,16 @@ public class FinanceiroService {
         }
     }
 
+    private void validarEspecialidadeDoDentista(Dentista dentista, Especialidade especialidade) {
+        boolean pertenceAoDentista = dentista.getEspecialidades() != null
+                && dentista.getEspecialidades().stream()
+                        .anyMatch(e -> e.getId().equals(especialidade.getId()));
+
+        if (!pertenceAoDentista) {
+            throw new RuntimeException("Especialidade nao pertence ao dentista selecionado");
+        }
+    }
+
     private FinanceiroTabelaPrecoResponseDto toTabelaPrecoResponseDto(FinanceiroTabelaPreco tabela) {
         return new FinanceiroTabelaPrecoResponseDto(
                 tabela.getId(),
@@ -294,6 +327,16 @@ public class FinanceiroService {
                 preco.getValor(),
                 preco.getAtivo(),
                 preco.getDataCriacao()
+        );
+    }
+
+    private FinanceiroPrecoSugestaoResponseDto toSugestaoResponseDto(FinanceiroPreco preco, String origem) {
+        return new FinanceiroPrecoSugestaoResponseDto(
+                true,
+                preco.getId(),
+                preco.getValor(),
+                preco.getDescricao(),
+                origem
         );
     }
 

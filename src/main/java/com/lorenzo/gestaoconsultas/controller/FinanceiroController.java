@@ -4,6 +4,7 @@ import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoResponseDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroPrecoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroPrecoResponseDto;
+import com.lorenzo.gestaoconsultas.dto.FinanceiroPrecoSugestaoResponseDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroResumoResponseDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroTabelaPrecoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroTabelaPrecoResponseDto;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -63,6 +65,12 @@ public class FinanceiroController {
     @PostMapping("/precos")
     public FinanceiroPrecoResponseDto criarPreco(@RequestBody @Valid FinanceiroPrecoRequestDto dto) {
         return service.criarPreco(dto);
+    }
+
+    @GetMapping("/precos/sugestao")
+    public FinanceiroPrecoSugestaoResponseDto sugerirPreco(@RequestParam Long dentistaId,
+                                                           @RequestParam Long especialidadeId) {
+        return service.sugerirPreco(dentistaId, especialidadeId);
     }
 
     @PutMapping("/precos/{id}/desativar")
