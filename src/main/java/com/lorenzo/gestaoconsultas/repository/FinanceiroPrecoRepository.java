@@ -19,9 +19,14 @@ public interface FinanceiroPrecoRepository extends JpaRepository<FinanceiroPreco
             Long especialidadeId
     );
 
-    boolean existsByTabelaPrecoIdAndEspecialidadeIdAndDentistaId(
+    boolean existsByTabelaPrecoIdAndEspecialidadeIdAndDentistaIdAndAtivoTrue(
             Long tabelaPrecoId,
             Long especialidadeId,
             Long dentistaId
+    );
+
+    boolean existsByTabelaPrecoIdAndEspecialidadeIdAndDentistaIsNullAndAtivoTrue(
+            Long tabelaPrecoId,
+            Long especialidadeId
     );
 }

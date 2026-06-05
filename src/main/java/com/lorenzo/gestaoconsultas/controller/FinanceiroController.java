@@ -2,7 +2,11 @@ package com.lorenzo.gestaoconsultas.controller;
 
 import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroLancamentoResponseDto;
+import com.lorenzo.gestaoconsultas.dto.FinanceiroPrecoRequestDto;
+import com.lorenzo.gestaoconsultas.dto.FinanceiroPrecoResponseDto;
 import com.lorenzo.gestaoconsultas.dto.FinanceiroResumoResponseDto;
+import com.lorenzo.gestaoconsultas.dto.FinanceiroTabelaPrecoRequestDto;
+import com.lorenzo.gestaoconsultas.dto.FinanceiroTabelaPrecoResponseDto;
 import com.lorenzo.gestaoconsultas.service.FinanceiroService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +37,37 @@ public class FinanceiroController {
     @GetMapping("/resumo")
     public FinanceiroResumoResponseDto resumo() {
         return service.resumo();
+    }
+
+    @GetMapping("/tabelas-preco")
+    public List<FinanceiroTabelaPrecoResponseDto> listarTabelasPreco() {
+        return service.listarTabelasPreco();
+    }
+
+    @PostMapping("/tabelas-preco")
+    public FinanceiroTabelaPrecoResponseDto criarTabelaPreco(
+            @RequestBody @Valid FinanceiroTabelaPrecoRequestDto dto) {
+        return service.criarTabelaPreco(dto);
+    }
+
+    @PutMapping("/tabelas-preco/{id}/desativar")
+    public FinanceiroTabelaPrecoResponseDto desativarTabelaPreco(@PathVariable Long id) {
+        return service.desativarTabelaPreco(id);
+    }
+
+    @GetMapping("/tabelas-preco/{id}/precos")
+    public List<FinanceiroPrecoResponseDto> listarPrecos(@PathVariable Long id) {
+        return service.listarPrecos(id);
+    }
+
+    @PostMapping("/precos")
+    public FinanceiroPrecoResponseDto criarPreco(@RequestBody @Valid FinanceiroPrecoRequestDto dto) {
+        return service.criarPreco(dto);
+    }
+
+    @PutMapping("/precos/{id}/desativar")
+    public FinanceiroPrecoResponseDto desativarPreco(@PathVariable Long id) {
+        return service.desativarPreco(id);
     }
 
     @GetMapping("/lancamentos/{id}")
