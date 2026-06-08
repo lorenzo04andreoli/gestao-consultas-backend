@@ -1,12 +1,14 @@
 package com.lorenzo.gestaoconsultas.service;
 
+import com.lorenzo.gestaoconsultas.dto.TwoFactorSetupResponseDto;
 import com.lorenzo.gestaoconsultas.dto.UsuarioAtualizacaoRequestDto;
+import com.lorenzo.gestaoconsultas.dto.UsuarioResponseDto;
 import com.lorenzo.gestaoconsultas.entity.Usuario;
 import com.lorenzo.gestaoconsultas.repository.DentistaRepository;
 import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.lorenzo.gestaoconsultas.dto.UsuarioResponseDto;
 
 import java.util.List;
 
@@ -15,19 +17,20 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final DentistaRepository dentistaRepository;
-
     private final BCryptPasswordEncoder encoder;
+    private final TwoFactorService twoFactorService;
 
     public UsuarioService(UsuarioRepository repository,
                           DentistaRepository dentistaRepository,
-                          BCryptPasswordEncoder encoder) {
+                          BCryptPasswordEncoder encoder,
+                          TwoFactorService twoFactorService) {
         this.encoder = encoder;
         this.repository = repository;
         this.dentistaRepository = dentistaRepository;
+        this.twoFactorService = twoFactorService;
     }
 
-
-    public UsuarioResponseDto salvar(Usuario usuario){
+    public UsuarioResponseDto salvar(Usuario usuario) {
         if ("DENTISTA".equals(usuario.getPerfil())) {
             throw new RuntimeException("Usuario dentista deve ser cadastrado pela tela de dentistas");
         }
@@ -42,32 +45,18 @@ public class UsuarioService {
 
         usuario.setSenha(encoder.encode(usuario.getSenha()));
         Usuario salvo = repository.save(usuario);
-        return new UsuarioResponseDto(
-                salvo.getId(),
-                salvo.getNome(),
-                salvo.getCpf(),
-                salvo.getEmail(),
-                salvo.getPerfil(),
-                salvo.getAtivo()
-        );
+        return toResponseDto(salvo);
     }
 
-    public List<UsuarioResponseDto> listar(){
+    public List<UsuarioResponseDto> listar() {
         return repository.findAll().stream()
-                .map(u -> new UsuarioResponseDto(
-                        u.getId(),
-                        u.getNome(),
-                        u.getCpf(),
-                        u.getEmail(),
-                        u.getPerfil(),
-                        u.getAtivo()
-                ))
+                .map(this::toResponseDto)
                 .toList();
     }
 
     public Usuario buscarPorId(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Usuario nao encontrado"));
     }
 
     public UsuarioResponseDto atualizar(Long id, UsuarioAtualizacaoRequestDto dto) {
@@ -108,8 +97,72 @@ public class UsuarioService {
         return toResponseDto(repository.save(usuario));
     }
 
+    public UsuarioResponseDto buscarPerfilAutenticado() {
+        return toResponseDto(buscarUsuarioAutenticado());
+    }
+
+    public UsuarioResponseDto atualizarFotoPerfil(String fotoPerfil) {
+        validarFotoPerfil(fotoPerfil);
+
+        Usuario usuario = buscarUsuarioAutenticado();
+        usuario.setFotoPerfil(fotoPerfil);
+        return toResponseDto(repository.save(usuario));
+    }
+
+    public UsuarioResponseDto removerFotoPerfil() {
+        Usuario usuario = buscarUsuarioAutenticado();
+        usuario.setFotoPerfil(null);
+        return toResponseDto(repository.save(usuario));
+    }
+
+    public TwoFactorSetupResponseDto iniciarTwoFactor() {
+        Usuario usuario = buscarUsuarioAutenticado();
+        TwoFactorSetupResponseDto setup = twoFactorService.gerarConfiguracao(usuario);
+
+        usuario.setTwoFactorSecret(setup.getSecret());
+        usuario.setTwoFactorAtivo(false);
+        repository.save(usuario);
+
+        return setup;
+    }
+
+    public UsuarioResponseDto confirmarTwoFactor(String codigo) {
+        Usuario usuario = buscarUsuarioAutenticado();
+
+        if (!twoFactorService.codigoValido(usuario.getTwoFactorSecret(), codigo)) {
+            throw new RuntimeException("Codigo de autenticacao invalido");
+        }
+
+        usuario.setTwoFactorAtivo(true);
+        return toResponseDto(repository.save(usuario));
+    }
+
+    public UsuarioResponseDto desativarTwoFactor() {
+        Usuario usuario = buscarUsuarioAutenticado();
+        usuario.setTwoFactorAtivo(false);
+        usuario.setTwoFactorSecret(null);
+        return toResponseDto(repository.save(usuario));
+    }
+
     public void deletar(Long id) {
         repository.deleteById(id);
+    }
+
+    private Usuario buscarUsuarioAutenticado() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario autenticado nao encontrado"));
+    }
+
+    private void validarFotoPerfil(String fotoPerfil) {
+        if (fotoPerfil == null || !fotoPerfil.startsWith("data:image/")) {
+            throw new RuntimeException("Foto de perfil invalida");
+        }
+
+        if (fotoPerfil.length() > 2_000_000) {
+            throw new RuntimeException("Foto de perfil deve ter no maximo 2 MB");
+        }
     }
 
     private UsuarioResponseDto toResponseDto(Usuario usuario) {
@@ -119,7 +172,9 @@ public class UsuarioService {
                 usuario.getCpf(),
                 usuario.getEmail(),
                 usuario.getPerfil(),
-                usuario.getAtivo()
+                usuario.getAtivo(),
+                usuario.getFotoPerfil(),
+                usuario.getTwoFactorAtivo()
         );
     }
 }

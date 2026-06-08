@@ -12,11 +12,17 @@ public class LoginRequestDto {
     @NotBlank
     private String senha;
 
+    private String codigo2fa;
+
     public String getEmail() {
         return email;
     }
 
     public String getSenha() {
         return senha;
+    }
+
+    public String getCodigo2fa() {
+        return codigo2fa;
     }
 }

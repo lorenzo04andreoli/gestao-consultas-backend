@@ -2,6 +2,7 @@ package com.lorenzo.gestaoconsultas.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.lorenzo.gestaoconsultas.config.CryptoConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -37,13 +38,22 @@ public class Usuario {
 
     private Boolean ativo = true;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String fotoPerfil;
+
+    private Boolean twoFactorAtivo = false;
+
+    @Convert(converter = CryptoConverter.class)
+    private String twoFactorSecret;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
 
     private LocalDateTime ultimoLogin;
 
-    public Usuario(Long id, String nome, String cpf, String email, String senha, String perfil, Boolean ativo, LocalDateTime dataCriacao, LocalDateTime ultimoLogin) {
+    public Usuario(Long id, String nome, String cpf, String email, String senha, String perfil, Boolean ativo, String fotoPerfil, Boolean twoFactorAtivo, String twoFactorSecret, LocalDateTime dataCriacao, LocalDateTime ultimoLogin) {
         this.id = id;
         this.nome = nome;
         this.cpf = cpf;
@@ -51,6 +61,9 @@ public class Usuario {
         this.senha = senha;
         this.perfil = perfil;
         this.ativo = ativo;
+        this.fotoPerfil = fotoPerfil;
+        this.twoFactorAtivo = twoFactorAtivo;
+        this.twoFactorSecret = twoFactorSecret;
         this.dataCriacao = dataCriacao;
         this.ultimoLogin = ultimoLogin;
     }
@@ -112,6 +125,30 @@ public class Usuario {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
+    }
+
+    public Boolean getTwoFactorAtivo() {
+        return twoFactorAtivo;
+    }
+
+    public void setTwoFactorAtivo(Boolean twoFactorAtivo) {
+        this.twoFactorAtivo = twoFactorAtivo;
+    }
+
+    public String getTwoFactorSecret() {
+        return twoFactorSecret;
+    }
+
+    public void setTwoFactorSecret(String twoFactorSecret) {
+        this.twoFactorSecret = twoFactorSecret;
     }
 
     public LocalDateTime getDataCriacao() {
