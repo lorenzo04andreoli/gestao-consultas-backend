@@ -2,6 +2,7 @@ package com.lorenzo.gestaoconsultas.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.lorenzo.gestaoconsultas.config.CryptoConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -43,6 +44,7 @@ public class Usuario {
 
     private Boolean twoFactorAtivo = false;
 
+    @Convert(converter = CryptoConverter.class)
     private String twoFactorSecret;
 
     @Column(nullable = false, updatable = false)
