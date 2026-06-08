@@ -4,6 +4,7 @@ import com.lorenzo.gestaoconsultas.dto.UsuarioAtualizacaoRequestDto;
 import com.lorenzo.gestaoconsultas.entity.Usuario;
 import com.lorenzo.gestaoconsultas.repository.DentistaRepository;
 import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.lorenzo.gestaoconsultas.dto.UsuarioResponseDto;
@@ -48,7 +49,8 @@ public class UsuarioService {
                 salvo.getCpf(),
                 salvo.getEmail(),
                 salvo.getPerfil(),
-                salvo.getAtivo()
+                salvo.getAtivo(),
+                salvo.getFotoPerfil()
         );
     }
 
@@ -60,7 +62,8 @@ public class UsuarioService {
                         u.getCpf(),
                         u.getEmail(),
                         u.getPerfil(),
-                        u.getAtivo()
+                        u.getAtivo(),
+                        u.getFotoPerfil()
                 ))
                 .toList();
     }
@@ -108,8 +111,43 @@ public class UsuarioService {
         return toResponseDto(repository.save(usuario));
     }
 
+    public UsuarioResponseDto buscarPerfilAutenticado() {
+        return toResponseDto(buscarUsuarioAutenticado());
+    }
+
+    public UsuarioResponseDto atualizarFotoPerfil(String fotoPerfil) {
+        validarFotoPerfil(fotoPerfil);
+
+        Usuario usuario = buscarUsuarioAutenticado();
+        usuario.setFotoPerfil(fotoPerfil);
+        return toResponseDto(repository.save(usuario));
+    }
+
+    public UsuarioResponseDto removerFotoPerfil() {
+        Usuario usuario = buscarUsuarioAutenticado();
+        usuario.setFotoPerfil(null);
+        return toResponseDto(repository.save(usuario));
+    }
+
     public void deletar(Long id) {
         repository.deleteById(id);
+    }
+
+    private Usuario buscarUsuarioAutenticado() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario autenticado nao encontrado"));
+    }
+
+    private void validarFotoPerfil(String fotoPerfil) {
+        if (fotoPerfil == null || !fotoPerfil.startsWith("data:image/")) {
+            throw new RuntimeException("Foto de perfil invalida");
+        }
+
+        if (fotoPerfil.length() > 2_000_000) {
+            throw new RuntimeException("Foto de perfil deve ter no maximo 2 MB");
+        }
     }
 
     private UsuarioResponseDto toResponseDto(Usuario usuario) {
@@ -119,7 +157,8 @@ public class UsuarioService {
                 usuario.getCpf(),
                 usuario.getEmail(),
                 usuario.getPerfil(),
-                usuario.getAtivo()
+                usuario.getAtivo(),
+                usuario.getFotoPerfil()
         );
     }
 }

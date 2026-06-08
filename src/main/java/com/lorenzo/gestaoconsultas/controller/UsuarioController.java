@@ -1,6 +1,7 @@
 package com.lorenzo.gestaoconsultas.controller;
 
 import com.lorenzo.gestaoconsultas.dto.UsuarioAtualizacaoRequestDto;
+import com.lorenzo.gestaoconsultas.dto.UsuarioFotoRequestDto;
 import com.lorenzo.gestaoconsultas.dto.UsuarioResponseDto;
 import com.lorenzo.gestaoconsultas.entity.Usuario;
 import com.lorenzo.gestaoconsultas.service.UsuarioService;
@@ -30,6 +31,21 @@ public class UsuarioController {
         return service.listar();
     }
 
+    @GetMapping("/me")
+    public UsuarioResponseDto perfilAutenticado() {
+        return service.buscarPerfilAutenticado();
+    }
+
+    @PutMapping("/me/foto")
+    public UsuarioResponseDto atualizarFotoPerfil(@RequestBody @Valid UsuarioFotoRequestDto dto) {
+        return service.atualizarFotoPerfil(dto.getFotoPerfil());
+    }
+
+    @DeleteMapping("/me/foto")
+    public UsuarioResponseDto removerFotoPerfil() {
+        return service.removerFotoPerfil();
+    }
+
     @GetMapping("/{id}")
     public UsuarioResponseDto buscarPorId(@PathVariable Long id) {
         Usuario u = service.buscarPorId(id);
@@ -40,7 +56,8 @@ public class UsuarioController {
                 u.getCpf(),
                 u.getEmail(),
                 u.getPerfil(),
-                u.getAtivo()
+                u.getAtivo(),
+                u.getFotoPerfil()
         );
     }
 

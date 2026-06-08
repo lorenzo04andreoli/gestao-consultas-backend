@@ -37,13 +37,17 @@ public class Usuario {
 
     private Boolean ativo = true;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String fotoPerfil;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime dataCriacao;
 
 
     private LocalDateTime ultimoLogin;
 
-    public Usuario(Long id, String nome, String cpf, String email, String senha, String perfil, Boolean ativo, LocalDateTime dataCriacao, LocalDateTime ultimoLogin) {
+    public Usuario(Long id, String nome, String cpf, String email, String senha, String perfil, Boolean ativo, String fotoPerfil, LocalDateTime dataCriacao, LocalDateTime ultimoLogin) {
         this.id = id;
         this.nome = nome;
         this.cpf = cpf;
@@ -51,6 +55,7 @@ public class Usuario {
         this.senha = senha;
         this.perfil = perfil;
         this.ativo = ativo;
+        this.fotoPerfil = fotoPerfil;
         this.dataCriacao = dataCriacao;
         this.ultimoLogin = ultimoLogin;
     }
@@ -112,6 +117,14 @@ public class Usuario {
 
     public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 
     public LocalDateTime getDataCriacao() {

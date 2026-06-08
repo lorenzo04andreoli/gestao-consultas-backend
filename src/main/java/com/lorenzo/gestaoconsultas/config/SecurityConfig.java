@@ -55,6 +55,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
 
+                        .requestMatchers(HttpMethod.GET, "/usuarios/me").hasAnyRole("ADMIN", "DENTISTA")
+                        .requestMatchers(HttpMethod.PUT, "/usuarios/me/foto").hasAnyRole("ADMIN", "DENTISTA")
+                        .requestMatchers(HttpMethod.DELETE, "/usuarios/me/foto").hasAnyRole("ADMIN", "DENTISTA")
                         .requestMatchers("/usuarios", "/usuarios/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/dentistas", "/dentistas/**").hasAnyRole("ADMIN", "DENTISTA")
                         .requestMatchers(HttpMethod.POST, "/dentistas").hasRole("ADMIN")
