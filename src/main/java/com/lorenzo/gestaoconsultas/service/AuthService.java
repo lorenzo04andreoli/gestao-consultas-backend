@@ -42,6 +42,15 @@ public class AuthService {
         }
 
         if (Boolean.TRUE.equals(usuario.getTwoFactorAtivo())) {
+            if (usuario.getTwoFactorSecret() == null || usuario.getTwoFactorSecret().isBlank()) {
+                usuario.setTwoFactorAtivo(false);
+                usuario.setTwoFactorSecret(null);
+                usuario.setUltimoLogin(LocalDateTime.now());
+                repository.save(usuario);
+
+                return new LoginResponseDto(jwtService.gerarToken(usuario), false);
+            }
+
             if (request.getCodigo2fa() == null || request.getCodigo2fa().isBlank()) {
                 return new LoginResponseDto(null, true);
             }
