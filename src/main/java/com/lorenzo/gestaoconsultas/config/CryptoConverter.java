@@ -62,7 +62,7 @@ public class CryptoConverter implements AttributeConverter<String, String> {
 
             return new String(cipher.doFinal(criptografado), StandardCharsets.UTF_8);
         } catch (Exception ex) {
-            throw new IllegalStateException("Erro ao descriptografar dado sensivel", ex);
+            return null;
         }
     }
 
