@@ -10,6 +10,7 @@ public class SolicitacaoAlteracaoResponseDto {
     private Long solicitanteId;
     private String solicitanteNome;
     private String solicitanteEmail;
+    private String assunto;
     private String descricao;
     private StatusSolicitacaoAlteracao status;
     private String resposta;
@@ -22,6 +23,7 @@ public class SolicitacaoAlteracaoResponseDto {
                                            Long solicitanteId,
                                            String solicitanteNome,
                                            String solicitanteEmail,
+                                           String assunto,
                                            String descricao,
                                            StatusSolicitacaoAlteracao status,
                                            String resposta,
@@ -33,6 +35,7 @@ public class SolicitacaoAlteracaoResponseDto {
         this.solicitanteId = solicitanteId;
         this.solicitanteNome = solicitanteNome;
         this.solicitanteEmail = solicitanteEmail;
+        this.assunto = assunto;
         this.descricao = descricao;
         this.status = status;
         this.resposta = resposta;
@@ -46,6 +49,7 @@ public class SolicitacaoAlteracaoResponseDto {
     public Long getSolicitanteId() { return solicitanteId; }
     public String getSolicitanteNome() { return solicitanteNome; }
     public String getSolicitanteEmail() { return solicitanteEmail; }
+    public String getAssunto() { return assunto; }
     public String getDescricao() { return descricao; }
     public StatusSolicitacaoAlteracao getStatus() { return status; }
     public String getResposta() { return resposta; }

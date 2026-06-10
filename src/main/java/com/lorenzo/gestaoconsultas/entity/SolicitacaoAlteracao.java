@@ -29,6 +29,9 @@ public class SolicitacaoAlteracao {
     @JoinColumn(name = "solicitante_id", nullable = false)
     private Usuario solicitante;
 
+    @Column(length = 120)
+    private String assunto;
+
     @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String descricao;
@@ -65,6 +68,14 @@ public class SolicitacaoAlteracao {
 
     public void setSolicitante(Usuario solicitante) {
         this.solicitante = solicitante;
+    }
+
+    public String getAssunto() {
+        return assunto;
+    }
+
+    public void setAssunto(String assunto) {
+        this.assunto = assunto;
     }
 
     public String getDescricao() {

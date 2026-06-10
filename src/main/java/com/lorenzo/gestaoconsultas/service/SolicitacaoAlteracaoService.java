@@ -34,6 +34,7 @@ public class SolicitacaoAlteracaoService {
 
         SolicitacaoAlteracao solicitacao = new SolicitacaoAlteracao();
         solicitacao.setSolicitante(solicitante);
+        solicitacao.setAssunto(dto.getAssunto().trim());
         solicitacao.setDescricao(dto.getDescricao().trim());
 
         SolicitacaoAlteracao salva = solicitacaoRepository.save(solicitacao);
@@ -88,7 +89,7 @@ public class SolicitacaoAlteracaoService {
         admins.forEach(admin -> notificacaoService.criar(
                 admin,
                 "Nova solicitacao de alteracao",
-                solicitacao.getSolicitante().getNome() + " solicitou alteracao de dados.",
+                solicitacao.getSolicitante().getNome() + " solicitou alteracao: " + solicitacao.getAssunto() + ".",
                 "/solicitacoes-alteracao"
         ));
     }
@@ -117,6 +118,7 @@ public class SolicitacaoAlteracaoService {
                 solicitacao.getSolicitante().getId(),
                 solicitacao.getSolicitante().getNome(),
                 solicitacao.getSolicitante().getEmail(),
+                solicitacao.getAssunto(),
                 solicitacao.getDescricao(),
                 solicitacao.getStatus(),
                 solicitacao.getResposta(),
