@@ -3,6 +3,8 @@ package com.lorenzo.gestaoconsultas.service;
 
 import com.lorenzo.gestaoconsultas.entity.Paciente;
 import com.lorenzo.gestaoconsultas.repository.PacienteRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +34,10 @@ public class PacienteService {
 
     public List<Paciente> listar() {
         return repository.findAll();
+    }
+
+    public Page<Paciente> listarPaginado(String termo, Boolean ativo, Pageable pageable) {
+        return repository.buscarPaginado(normalizarTermo(termo), ativo, pageable);
     }
 
     public Paciente buscarPorId(Long id) {
@@ -65,5 +71,9 @@ public class PacienteService {
 
      public Paciente deletar(Long id) {
         return desativar(id);
+    }
+
+    private String normalizarTermo(String termo) {
+        return termo == null ? "" : termo.trim();
     }
 }

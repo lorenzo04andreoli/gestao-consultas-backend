@@ -13,6 +13,8 @@ import com.lorenzo.gestaoconsultas.repository.DentistaRepository;
 import com.lorenzo.gestaoconsultas.repository.EspecialidadeRepository;
 import com.lorenzo.gestaoconsultas.repository.PacienteRepository;
 import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -98,6 +100,27 @@ public class ConsultaService {
         }
 
         return toResponseDtoList(repository.findAll());
+    }
+
+    public Page<ConsultaResponseDto> listarPaginado(String termo,
+                                                    String status,
+                                                    LocalDateTime inicio,
+                                                    LocalDateTime fim,
+                                                    Pageable pageable) {
+        Usuario usuario = getUsuarioAutenticado();
+        Long usuarioDentistaId = isDentista(usuario) ? usuario.getId() : null;
+        StatusConsulta statusConsulta = status == null || status.isBlank()
+                ? null
+                : StatusConsulta.valueOf(status);
+
+        return repository.buscarPaginado(
+                usuarioDentistaId,
+                normalizarTermo(termo),
+                statusConsulta,
+                inicio,
+                fim,
+                pageable
+        ).map(this::toResponseDto);
     }
 
     public ConsultaResponseDto cancelar(Long id, String motivo) {
@@ -212,6 +235,10 @@ public class ConsultaService {
         return consultas.stream()
                 .map(this::toResponseDto)
                 .toList();
+    }
+
+    private String normalizarTermo(String termo) {
+        return termo == null ? "" : termo.trim();
     }
 
     private ConsultaResponseDto toResponseDto(Consulta consulta) {
