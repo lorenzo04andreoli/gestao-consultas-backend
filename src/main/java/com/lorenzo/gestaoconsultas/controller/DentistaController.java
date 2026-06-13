@@ -5,6 +5,10 @@ import com.lorenzo.gestaoconsultas.dto.DentistaCadastroRequestDto;
 import com.lorenzo.gestaoconsultas.dto.DentistaResponseDto;
 import com.lorenzo.gestaoconsultas.service.DentistaService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +32,14 @@ public class DentistaController {
     @GetMapping
     public List<DentistaResponseDto> listar() {
         return service.listar();
+    }
+
+    @GetMapping("/paginado")
+    public Page<DentistaResponseDto> listarPaginado(@RequestParam(required = false) String termo,
+                                                   @RequestParam(required = false) Boolean ativo,
+                                                   @PageableDefault(size = 10, sort = "nome", direction = Sort.Direction.ASC)
+                                                   Pageable pageable) {
+        return service.listarPaginado(termo, ativo, pageable);
     }
 
     @GetMapping("/{id}")

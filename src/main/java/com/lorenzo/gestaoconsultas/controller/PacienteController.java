@@ -4,6 +4,10 @@ package com.lorenzo.gestaoconsultas.controller;
 import com.lorenzo.gestaoconsultas.entity.Paciente;
 import com.lorenzo.gestaoconsultas.service.PacienteService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +30,14 @@ public class PacienteController {
     @GetMapping
     public List<Paciente> listar() {
         return service.listar();
+    }
+
+    @GetMapping("/paginado")
+    public Page<Paciente> listarPaginado(@RequestParam(required = false) String termo,
+                                         @RequestParam(required = false) Boolean ativo,
+                                         @PageableDefault(size = 10, sort = "nome", direction = Sort.Direction.ASC)
+                                         Pageable pageable) {
+        return service.listarPaginado(termo, ativo, pageable);
     }
 
     @GetMapping("/{id}")

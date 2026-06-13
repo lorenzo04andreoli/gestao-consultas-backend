@@ -10,6 +10,8 @@ import com.lorenzo.gestaoconsultas.repository.DentistaRepository;
 import com.lorenzo.gestaoconsultas.repository.EspecialidadeRepository;
 import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -80,6 +82,11 @@ public class DentistaService {
         return repository.findAll().stream()
                 .map(this::toResponseDto)
                 .toList();
+    }
+
+    public Page<DentistaResponseDto> listarPaginado(String termo, Boolean ativo, Pageable pageable) {
+        return repository.buscarPaginado(normalizarTermo(termo), ativo, pageable)
+                .map(this::toResponseDto);
     }
 
     public Dentista buscarPorId(Long id) {
@@ -220,5 +227,9 @@ public class DentistaService {
                 d.getUsuario() == null ? null : d.getUsuario().getId(),
                 especialidades
         );
+    }
+
+    private String normalizarTermo(String termo) {
+        return termo == null ? "" : termo.trim();
     }
 }

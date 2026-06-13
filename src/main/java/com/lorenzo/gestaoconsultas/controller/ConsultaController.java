@@ -4,6 +4,10 @@ import com.lorenzo.gestaoconsultas.dto.ConsultaRequestDto;
 import com.lorenzo.gestaoconsultas.dto.ConsultaResponseDto;
 import com.lorenzo.gestaoconsultas.service.ConsultaService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -27,6 +31,25 @@ public class ConsultaController {
     @GetMapping
     public List<ConsultaResponseDto> listar() {
         return service.listar();
+    }
+
+    @GetMapping("/paginado")
+    public Page<ConsultaResponseDto> listarPaginado(
+            @RequestParam(required = false) String termo,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String dataInicio,
+            @RequestParam(required = false) String dataFim,
+            @PageableDefault(size = 10, sort = "dataInicio", direction = Sort.Direction.DESC)
+            Pageable pageable
+    ) {
+        LocalDateTime inicio = dataInicio != null && !dataInicio.isBlank()
+                ? LocalDateTime.parse(dataInicio)
+                : null;
+        LocalDateTime fim = dataFim != null && !dataFim.isBlank()
+                ? LocalDateTime.parse(dataFim)
+                : null;
+
+        return service.listarPaginado(termo, status, inicio, fim, pageable);
     }
 
     @PutMapping("/{id}/cancelar")
