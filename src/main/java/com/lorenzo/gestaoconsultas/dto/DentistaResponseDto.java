@@ -11,15 +11,22 @@ public class DentistaResponseDto {
     private String cro;
     private Boolean ativo;
     private Long usuarioId;
+    private String fotoPerfil;
     private List<String> especialidades;
 
     public DentistaResponseDto(Long id, String nome, String email,
                                String cro, Boolean ativo, List<String> especialidades) {
-        this(id, nome, null, email, cro, ativo, null, especialidades);
+        this(id, nome, null, email, cro, ativo, null, null, especialidades);
     }
 
     public DentistaResponseDto(Long id, String nome, String cpf, String email,
                                String cro, Boolean ativo, Long usuarioId, List<String> especialidades) {
+        this(id, nome, cpf, email, cro, ativo, usuarioId, null, especialidades);
+    }
+
+    public DentistaResponseDto(Long id, String nome, String cpf, String email,
+                               String cro, Boolean ativo, Long usuarioId, String fotoPerfil,
+                               List<String> especialidades) {
         this.id = id;
         this.nome = nome;
         this.cpf = cpf;
@@ -27,6 +34,7 @@ public class DentistaResponseDto {
         this.cro = cro;
         this.ativo = ativo;
         this.usuarioId = usuarioId;
+        this.fotoPerfil = fotoPerfil;
         this.especialidades = especialidades;
     }
 
@@ -85,6 +93,14 @@ public class DentistaResponseDto {
 
     public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 
     public List<String> getEspecialidades() {
