@@ -29,11 +29,11 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 INSERT INTO usuarios (id, nome, cpf, email, senha, perfil, ativo, data_criacao, ultimo_login, foto_perfil, two_factor_ativo, two_factor_secret)
 VALUES
-    (1, 'Lorenzo Carneiro Andreoli', '13266668944', 'lorenzo04andreoli@email.com', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'ADMIN', true, '2026-05-01 08:00:00', null, null, false, null),
-    (2, 'Dr Joao Alves Camargo', '28735691077', 'joaoacamargo@dentix.com', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'DENTISTA', true, '2026-05-01 08:10:00', null, null, false, null),
-    (3, 'Dr ALDEMIR CASTRO LOPES', '96045399064', 'aldemirclopes@dentix.com', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'DENTISTA', true, '2026-05-01 08:20:00', null, null, false, null),
-    (4, 'Adalton Gomes de Souza', '24060003034', 'adaltongsouza@dentix.com', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'DENTISTA', true, '2026-05-01 08:30:00', null, null, false, null),
-    (5, 'Adailton de Lima Monteiro', '01945910934', 'adailton1@dentix.com', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'ADMIN', true, '2026-05-01 08:40:00', null, null, false, null);
+    (1, 'Lorenzo Carneiro Andreoli', '04905882044', 'lorenzo.andreoli@dentix.com.br', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'ADMIN', true, '2026-05-01 08:00:00', null, null, false, null),
+    (2, 'Marina Alves Ribeiro', '07674066304', 'marina.ribeiro@dentix.com.br', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'ADMIN', true, '2026-05-01 08:10:00', null, null, false, null),
+    (3, 'Dr Joao Alves Camargo', '18935671096', 'joao.camargo@dentix.com.br', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'DENTISTA', true, '2026-05-01 08:20:00', null, null, false, null),
+    (4, 'Dra Helena Castro Lopes', '22107445125', 'helena.lopes@dentix.com.br', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'DENTISTA', true, '2026-05-01 08:30:00', null, null, false, null),
+    (5, 'Dr Miguel Gomes de Souza', '24133514696', 'miguel.souza@dentix.com.br', '$2a$10$62HmIpBscIPAJXEnTCHuiecssI2VC1eLh6dSr5IlG/8EEQ.bYC37K', 'DENTISTA', true, '2026-05-01 08:40:00', null, null, false, null);
 
 INSERT INTO especialidades (id, nome)
 VALUES
@@ -45,9 +45,9 @@ VALUES
 
 INSERT INTO dentistas (id, nome, cpf, email, cro, ativo, data_criacao, usuario_id)
 VALUES
-    (1, 'Dr Joao Alves Camargo', '28735691077', 'joaoacamargo@dentix.com', 'CRO/PR 15482', true, '2026-05-01 09:00:00', 2),
-    (2, 'Dr ALDEMIR CASTRO LOPES', '96045399064', 'aldemirclopes@dentix.com', 'CRO/PR 73528', true, '2026-05-01 09:10:00', 3),
-    (3, 'Adalton Gomes de Souza', '24060003034', 'adaltongsouza@dentix.com', 'CRO/PR 84163', true, '2026-05-01 09:20:00', 4);
+    (1, 'Dr Joao Alves Camargo', '18935671096', 'joao.camargo@dentix.com.br', 'CRO/PR 15482', true, '2026-05-01 09:00:00', 3),
+    (2, 'Dra Helena Castro Lopes', '22107445125', 'helena.lopes@dentix.com.br', 'CRO/PR 73528', true, '2026-05-01 09:10:00', 4),
+    (3, 'Dr Miguel Gomes de Souza', '24133514696', 'miguel.souza@dentix.com.br', 'CRO/PR 84163', true, '2026-05-01 09:20:00', 5);
 
 INSERT INTO dentista_especialidade (dentista_id, especialidade_id)
 VALUES
@@ -103,10 +103,10 @@ VALUES
 INSERT INTO notificacoes (id, destinatario_id, titulo, mensagem, link, lida, data_criacao, data_leitura)
 VALUES
     (1, 1, 'Solicitacao de alteracao recebida', 'Dr Joao Alves Camargo solicitou alteracao de dados cadastrais.', '/solicitacoes-alteracao', false, '2026-06-12 09:30:00', null),
-    (2, 2, 'Solicitacao respondida', 'Sua solicitacao de alteracao foi respondida pelo administrador.', '/perfil', true, '2026-06-12 11:00:00', '2026-06-12 11:20:00');
+    (2, 4, 'Solicitacao respondida', 'Sua solicitacao de alteracao foi respondida pelo administrador.', '/perfil', true, '2026-06-12 11:00:00', '2026-06-12 11:20:00');
 
 INSERT INTO solicitacoes_alteracao (id, solicitante_id, assunto, descricao, status, resposta, respondida_por_id, data_criacao, data_resposta)
 VALUES
-    (1, 2, 'Atualizacao de telefone', 'Solicito alterar meu telefone cadastrado para (41) 98888-7777.', 'PENDENTE', null, null, '2026-06-12 09:30:00', null),
-    (2, 3, 'Correcao de nome profissional', 'Solicito ajustar a grafia do meu nome profissional nos dados do sistema.', 'RESPONDIDA', 'Dados revisados. A alteracao foi registrada no cadastro.', 1, '2026-06-11 10:00:00', '2026-06-11 15:00:00');
+    (1, 3, 'Atualizacao de telefone', 'Solicito alterar meu telefone cadastrado para (41) 98888-7777.', 'PENDENTE', null, null, '2026-06-12 09:30:00', null),
+    (2, 4, 'Correcao de nome profissional', 'Solicito ajustar a grafia do meu nome profissional nos dados do sistema.', 'RESPONDIDA', 'Dados revisados. A alteracao foi registrada no cadastro.', 1, '2026-06-11 10:00:00', '2026-06-11 15:00:00');
 
