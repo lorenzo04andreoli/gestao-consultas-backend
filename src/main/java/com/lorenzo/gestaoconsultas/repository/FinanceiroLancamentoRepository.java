@@ -9,10 +9,13 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface FinanceiroLancamentoRepository extends JpaRepository<FinanceiroLancamento, Long> {
 
     boolean existsByConsultaId(Long consultaId);
+
+    Optional<FinanceiroLancamento> findByConsultaId(Long consultaId);
 
     List<FinanceiroLancamento> findAllByOrderByDataCriacaoDesc();
 

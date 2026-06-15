@@ -256,6 +256,7 @@ public class ConsultaService {
                 consulta.getId(),
                 consulta.getPaciente().getId(),
                 consulta.getPaciente().getNome(),
+                consulta.getPaciente().getTelefone(),
                 consulta.getDentista().getId(),
                 consulta.getDentista().getNome(),
                 especialidade == null ? null : especialidade.getId(),
@@ -264,6 +265,7 @@ public class ConsultaService {
                 consulta.getDescricao(),
                 consulta.getDataInicio(),
                 consulta.getDataFim(),
+                financeiroService.buscarValorDaConsulta(consulta.getId()),
                 consulta.getStatus().name(),
                 consulta.getMotivoCancelamento()
         );

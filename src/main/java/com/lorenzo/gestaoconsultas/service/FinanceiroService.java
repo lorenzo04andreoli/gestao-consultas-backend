@@ -39,6 +39,16 @@ public class FinanceiroService {
         return toResponseDto(buscarLancamentoPorId(id));
     }
 
+    public BigDecimal buscarValorDaConsulta(Long consultaId) {
+        if (consultaId == null) {
+            return null;
+        }
+
+        return repository.findByConsultaId(consultaId)
+                .map(FinanceiroLancamento::getValor)
+                .orElse(null);
+    }
+
     public FinanceiroResumoResponseDto resumo() {
         LocalDateTime inicioMes = LocalDate.now()
                 .withDayOfMonth(1)
