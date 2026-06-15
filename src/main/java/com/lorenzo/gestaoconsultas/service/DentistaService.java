@@ -225,6 +225,7 @@ public class DentistaService {
                 d.getCro(),
                 d.getAtivo(),
                 d.getUsuario() == null ? null : d.getUsuario().getId(),
+                d.getUsuario() == null ? null : d.getUsuario().getFotoPerfil(),
                 especialidades
         );
     }

@@ -1,5 +1,6 @@
 package com.lorenzo.gestaoconsultas.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ConsultaResponseDto {
@@ -7,6 +8,7 @@ public class ConsultaResponseDto {
     private Long id;
     private Long pacienteId;
     private String pacienteNome;
+    private String pacienteTelefone;
     private Long dentistaId;
     private String dentistaNome;
     private Long especialidadeId;
@@ -15,17 +17,19 @@ public class ConsultaResponseDto {
     private String descricao;
     private LocalDateTime dataInicio;
     private LocalDateTime dataFim;
+    private BigDecimal valor;
     private String status;
     private String motivoCancelamento;
 
-    public ConsultaResponseDto(Long id, Long pacienteId, String pacienteNome, Long dentistaId,
-                               String dentistaNome, Long especialidadeId, String especialidadeNome,
-                               String usuarioNome, String descricao,
-                               LocalDateTime dataInicio, LocalDateTime dataFim, String status,
-                               String motivoCancelamento) {
+    public ConsultaResponseDto(Long id, Long pacienteId, String pacienteNome, String pacienteTelefone,
+                               Long dentistaId, String dentistaNome, Long especialidadeId,
+                               String especialidadeNome, String usuarioNome, String descricao,
+                               LocalDateTime dataInicio, LocalDateTime dataFim, BigDecimal valor,
+                               String status, String motivoCancelamento) {
         this.id = id;
         this.pacienteId = pacienteId;
         this.pacienteNome = pacienteNome;
+        this.pacienteTelefone = pacienteTelefone;
         this.dentistaId = dentistaId;
         this.dentistaNome = dentistaNome;
         this.especialidadeId = especialidadeId;
@@ -34,6 +38,7 @@ public class ConsultaResponseDto {
         this.descricao = descricao;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
+        this.valor = valor;
         this.status = status;
         this.motivoCancelamento = motivoCancelamento;
     }
@@ -48,6 +53,10 @@ public class ConsultaResponseDto {
 
     public String getPacienteNome() {
         return pacienteNome;
+    }
+
+    public String getPacienteTelefone() {
+        return pacienteTelefone;
     }
 
     public Long getDentistaId() {
@@ -80,6 +89,10 @@ public class ConsultaResponseDto {
 
     public LocalDateTime getDataFim() {
         return dataFim;
+    }
+
+    public BigDecimal getValor() {
+        return valor;
     }
 
     public String getStatus() {

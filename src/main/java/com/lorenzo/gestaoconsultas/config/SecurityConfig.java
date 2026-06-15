@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/especialidades/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/clinica", "/clinica/**").hasAnyRole("ADMIN", "DENTISTA")
                         .requestMatchers(HttpMethod.PUT, "/clinica", "/clinica/**").hasRole("ADMIN")
+                        .requestMatchers("/financeiro", "/financeiro/**").hasRole("ADMIN")
                         .requestMatchers("/relatorios", "/relatorios/**").hasAnyRole("ADMIN", "DENTISTA")
                         .requestMatchers("/notificacoes", "/notificacoes/**").hasAnyRole("ADMIN", "DENTISTA")
                         .requestMatchers(HttpMethod.POST, "/solicitacoes-alteracao").hasAnyRole("ADMIN", "DENTISTA")
