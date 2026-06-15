@@ -3,6 +3,7 @@ package com.lorenzo.gestaoconsultas.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ConsultaRequestDto {
@@ -25,12 +26,15 @@ public class ConsultaRequestDto {
     @NotNull
     private LocalDateTime dataFim;
 
+    private BigDecimal valor;
+
     public Long getPacienteId() { return pacienteId; }
     public Long getDentistaId() { return dentistaId; }
     public Long getEspecialidadeId() { return especialidadeId; }
     public String getDescricao() { return descricao; }
     public LocalDateTime getDataInicio() { return dataInicio; }
     public LocalDateTime getDataFim() { return dataFim; }
+    public BigDecimal getValor() { return valor; }
 
 }
 

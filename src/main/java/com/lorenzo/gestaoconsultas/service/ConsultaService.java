@@ -13,6 +13,7 @@ import com.lorenzo.gestaoconsultas.repository.DentistaRepository;
 import com.lorenzo.gestaoconsultas.repository.EspecialidadeRepository;
 import com.lorenzo.gestaoconsultas.repository.PacienteRepository;
 import com.lorenzo.gestaoconsultas.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,17 +30,21 @@ public class ConsultaService {
     private final PacienteRepository pacienteRepository;
     private final DentistaRepository dentistaRepository;
     private final EspecialidadeRepository especialidadeRepository;
+    private final FinanceiroService financeiroService;
 
     public ConsultaService(ConsultaRepository repository, UsuarioRepository usuarioRepository,
                            PacienteRepository pacienteRepository, DentistaRepository dentistaRepository,
-                           EspecialidadeRepository especialidadeRepository) {
+                           EspecialidadeRepository especialidadeRepository,
+                           FinanceiroService financeiroService) {
         this.dentistaRepository = dentistaRepository;
         this.pacienteRepository = pacienteRepository;
         this.usuarioRepository = usuarioRepository;
         this.especialidadeRepository = especialidadeRepository;
         this.repository = repository;
+        this.financeiroService = financeiroService;
     }
 
+    @Transactional
     public ConsultaResponseDto agendar(ConsultaRequestDto dto) {
         Usuario usuario = getUsuarioAutenticado();
 
@@ -67,7 +72,10 @@ public class ConsultaService {
 
         validarAgendamento(usuario, paciente, dentista, consulta);
 
-        return toResponseDto(repository.save(consulta));
+        Consulta consultaSalva = repository.save(consulta);
+        financeiroService.criarCobrancaDaConsulta(consultaSalva, dto.getValor());
+
+        return toResponseDto(consultaSalva);
     }
 
     public ConsultaResponseDto finalizar(Long id) {
