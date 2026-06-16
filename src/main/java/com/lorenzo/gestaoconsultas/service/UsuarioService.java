@@ -102,15 +102,25 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDto atualizarFotoPerfil(String fotoPerfil) {
+        Usuario usuario = buscarUsuarioAutenticado();
+        return atualizarFotoPerfil(usuario.getId(), fotoPerfil);
+    }
+
+    public UsuarioResponseDto atualizarFotoPerfil(Long id, String fotoPerfil) {
         validarFotoPerfil(fotoPerfil);
 
-        Usuario usuario = buscarUsuarioAutenticado();
+        Usuario usuario = buscarPorId(id);
         usuario.setFotoPerfil(fotoPerfil);
         return toResponseDto(repository.save(usuario));
     }
 
     public UsuarioResponseDto removerFotoPerfil() {
         Usuario usuario = buscarUsuarioAutenticado();
+        return removerFotoPerfil(usuario.getId());
+    }
+
+    public UsuarioResponseDto removerFotoPerfil(Long id) {
+        Usuario usuario = buscarPorId(id);
         usuario.setFotoPerfil(null);
         return toResponseDto(repository.save(usuario));
     }
@@ -178,3 +188,4 @@ public class UsuarioService {
         );
     }
 }
+
