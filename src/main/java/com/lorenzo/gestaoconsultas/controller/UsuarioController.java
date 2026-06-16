@@ -54,6 +54,17 @@ public class UsuarioController {
         return service.removerFotoPerfil();
     }
 
+    @PutMapping("/{id}/foto")
+    public UsuarioResponseDto atualizarFotoPerfilPorAdmin(@PathVariable Long id,
+                                                           @RequestBody @Valid UsuarioFotoRequestDto dto) {
+        return service.atualizarFotoPerfil(id, dto.getFotoPerfil());
+    }
+
+    @DeleteMapping("/{id}/foto")
+    public UsuarioResponseDto removerFotoPerfilPorAdmin(@PathVariable Long id) {
+        return service.removerFotoPerfil(id);
+    }
+
     @PostMapping("/me/2fa/setup")
     public TwoFactorSetupResponseDto iniciarTwoFactor() {
         return service.iniciarTwoFactor();
@@ -101,3 +112,4 @@ public class UsuarioController {
         service.deletar(id);
     }
 }
+
