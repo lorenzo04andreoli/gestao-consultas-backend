@@ -34,7 +34,7 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(List.of("http://localhost:4200", "https://dentix.app.br", "https://www.dentix.app.br"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
