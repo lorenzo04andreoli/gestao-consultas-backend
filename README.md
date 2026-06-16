@@ -4,6 +4,14 @@ API REST do Dentix, um sistema de gestão para clínica odontológica desenvolvi
 
 O backend foi construído com Java e Spring Boot, utilizando autenticação JWT, controle de permissões por perfil, persistência com Spring Data JPA e banco de dados MySQL. A API fornece os recursos necessários para gerenciamento de usuários, pacientes, dentistas, especialidades, consultas, relatórios, notificações, perfil, autenticação em dois fatores e financeiro.
 
+## Aplicação em produção
+
+```text
+https://dentix.app.br
+```
+
+A API é consumida em produção pelo frontend por meio do caminho `/api`, com Nginx na EC2 fazendo o encaminhamento para o container do backend Spring Boot.
+
 ## Tecnologias
 
 - Java 17
@@ -205,19 +213,25 @@ A arquitetura prevista é:
 Internet
   |
   v
-Nginx no host EC2
+Nginx no host EC2 com HTTPS
   |
   v
 Container frontend Nginx
   |
   v
-Container backend Spring Boot
+/api -> Container backend Spring Boot
   |
   v
 Container MySQL
 ```
 
 No deploy recomendado, apenas as portas `80` e `443` ficam públicas. O backend e o MySQL permanecem internos na rede Docker.
+
+Aplicação publicada:
+
+```text
+https://dentix.app.br
+```
 
 ## Endpoints principais
 
